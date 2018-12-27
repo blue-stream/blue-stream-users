@@ -8,30 +8,12 @@ export class UserRepository {
         return UserModel.create(user);
     }
 
-    static createMany(users: IUser[])
-        : Promise<IUser[]> {
-        return UserModel.insertMany(users);
-    }
-
     static updateById(id: string, user: Partial<IUser>)
         : Promise<IUser | null> {
         return UserModel.findByIdAndUpdate(
             id,
             { $set: user },
             { new: true, runValidators: true },
-        ).exec();
-    }
-
-    static updateMany(userFilter: Partial<IUser>, user: Partial<IUser>)
-        : Promise<any> {
-
-        if (Object.keys(user).length === 0) {
-            throw new ServerError('Update data is required.');
-        }
-
-        return UserModel.updateMany(
-            userFilter,
-            { $set: user },
         ).exec();
     }
 
