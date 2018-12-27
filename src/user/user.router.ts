@@ -6,8 +6,6 @@ import { Wrapper } from '../utils/wrapper';
 const UserRouter: Router = Router();
 
 UserRouter.post('/', UserValidator.canCreate, Wrapper.wrapAsync(UserController.create));
-UserRouter.post('/many', UserValidator.canCreateMany, Wrapper.wrapAsync(UserController.createMany));
-UserRouter.put('/many', UserValidator.canUpdateMany, Wrapper.wrapAsync(UserController.updateMany));
 UserRouter.put('/:id', UserValidator.canUpdateById, Wrapper.wrapAsync(UserController.updateById));
 UserRouter.delete('/:id', UserValidator.canDeleteById, Wrapper.wrapAsync(UserController.deleteById));
 UserRouter.get('/one', UserValidator.canGetOne, Wrapper.wrapAsync(UserController.getOne));
