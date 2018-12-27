@@ -1,30 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserValidations } from './user.validations';
-import { PropertyInvalidError, IdInvalidError } from '../../utils/errors/userErrors';
+import { PropertyInvalidError, IdInvalidError, NameInvalidError, MailInvalidError } from '../../utils/errors/userErrors';
 import { IUser } from '../user.interface';
 
 export class UserValidator {
 
     static canCreate(req: Request, res: Response, next: NextFunction) {
-        next(UserValidator.validateProperty(req.body.property));
-    }
-
-    static canCreateMany(req: Request, res: Response, next: NextFunction) {
-        const propertiesValidations: (Error | undefined)[] = req.body.map((user: IUser) => {
-            return UserValidator.validateProperty(user.property);
-        });
-
-        next(UserValidator.getNextValueFromArray(propertiesValidations));
+        next(
+            UserValidator.validateId(req.body.id) ||
+            UserValidator.vali);
     }
 
     static canUpdateById(req: Request, res: Response, next: NextFunction) {
         next(
             UserValidator.validateId(req.params.id) ||
-            UserValidator.validateProperty(req.body.property));
-    }
-
-    static canUpdateMany(req: Request, res: Response, next: NextFunction) {
-        next(UserValidator.validateProperty(req.query.property) ||
             UserValidator.validateProperty(req.body.property));
     }
 
@@ -56,6 +45,15 @@ export class UserValidator {
         return undefined;
     }
 
+    private static validateName(firstname: string, lastname: string) {
+        if (!UserValidations.isFirstnameValid(firstname) ||
+            !UserValidations.isLastnameValid(lastname)) {
+            return new NameInvalidError();
+        }
+
+        return undefined;
+    }
+
     private static getNextValueFromArray(validationsArray: (Error | undefined)[]) {
         let nextValue: Error | undefined;
 
@@ -66,13 +64,5 @@ export class UserValidator {
         }
 
         return nextValue;
-    }
-
-    private static validateProperty(property: string) {
-        if (!UserValidations.isPropertyValid(property)) {
-            return new PropertyInvalidError();
-        }
-
-        return undefined;
     }
 }
