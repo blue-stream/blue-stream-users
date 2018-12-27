@@ -46,48 +46,6 @@ describe('User Validator Middleware', function () {
         });
     });
 
-    describe('CreateMany Validator', function () {
-        context('When valid arguments are passed', function () {
-            it('Should not throw an error', function () {
-                UserValidator.canCreateMany(new ValidRequestMocks().createMany, responseMock, (error: Error) => {
-                    expect(error).to.not.exist;
-                });
-            });
-        });
-
-        context('When invalid arguments are passed', function () {
-            it('Should throw an PropertyInvalidError When property is undefined', function () {
-                const invalidRequestMock = new ValidRequestMocks().createMany;
-                invalidRequestMock.body[1].property = undefined;
-
-                UserValidator.canCreateMany(invalidRequestMock, responseMock, (error: Error) => {
-                    expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
-                });
-            });
-
-            it('Should throw an PropertyInvalidError When property is null', function () {
-                const invalidRequestMock = new ValidRequestMocks().createMany;
-                invalidRequestMock.body[1].property = null;
-
-                UserValidator.canCreateMany(invalidRequestMock, responseMock, (error: Error) => {
-                    expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
-                });
-            });
-
-            it('Should throw an PropertyInvalidError When property is too long', function () {
-                const invalidRequestMock = new ValidRequestMocks().createMany;
-                invalidRequestMock.body[1].property = '21412412421412414214';
-
-                UserValidator.canCreateMany(invalidRequestMock, responseMock, (error: Error) => {
-                    expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
-                });
-            });
-        });
-    });
-
     describe('UpdateById Validator', function () {
         context('When valid arguments are passed', function () {
             it('Should not throw an error', function () {
@@ -155,48 +113,6 @@ describe('User Validator Middleware', function () {
                 UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
                     expect(error).to.be.an.instanceof(IdInvalidError);
-                });
-            });
-        });
-    });
-
-    describe('canUpdateMany Validator', function () {
-        context('When valid arguments are passed', function () {
-            it('Should not throw an error', function () {
-                UserValidator.canUpdateMany(new ValidRequestMocks().updateMany, responseMock, (error: Error) => {
-                    expect(error).to.not.exist;
-                });
-            });
-        });
-
-        context('When invalid arguments are passed', function () {
-            it('Should throw an PropertyInvalidError When property is undefined', function () {
-                const invalidRequestMock = new ValidRequestMocks().updateMany;
-                invalidRequestMock.body.property = undefined;
-
-                UserValidator.canUpdateMany(invalidRequestMock, responseMock, (error: Error) => {
-                    expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
-                });
-            });
-
-            it('Should throw an PropertyInvalidError When property is null', function () {
-                const invalidRequestMock = new ValidRequestMocks().updateMany;
-                invalidRequestMock.body.property = null;
-
-                UserValidator.canUpdateMany(invalidRequestMock, responseMock, (error: Error) => {
-                    expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
-                });
-            });
-
-            it('Should throw an PropertyInvalidError When property is too long', function () {
-                const invalidRequestMock = new ValidRequestMocks().updateMany;
-                invalidRequestMock.body.property = '21414141412414124';
-
-                UserValidator.canUpdateMany(invalidRequestMock, responseMock, (error: Error) => {
-                    expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
                 });
             });
         });
