@@ -1,14 +1,49 @@
 import * as mongoose from 'mongoose';
 import { IUser } from './user.interface';
+import { UserValidations } from './validator/user.validations';
 
 const userSchema: mongoose.Schema = new mongoose.Schema(
     {
-        property: { type: String, required: true },
+        _id: {
+            type: String,
+            required: true,
+            validate: {
+                validator: UserValidations.isIdValid,
+            },
+        },
+        firstName: {
+            type: String,
+            required: true,
+            validate: {
+                validator: UserValidations.isFirstnameValid,
+            },
+        },
+        lastName: {
+            type: String,
+            required: true,
+            validate: {
+                validator: UserValidations.isLastnameValid,
+            },
+        },
+        email: {
+            type: String,
+            required: true,
+            validate: {
+                validator: UserValidations.isMailValid,
+            },
+            unique: true,
+        },
     },
     {
+        versionKey: false,
         autoIndex: false,
         timestamps: true,
-        id: true,
+        toJSON: {
+            virtuals: true,
+        },
+        toObject: {
+            virtuals: true,
+        },
     });
 
 export const UserModel = mongoose.model<IUser & mongoose.Document>('User', userSchema);
