@@ -20,8 +20,22 @@ export const config = {
         password: process.env.RMQ_PASSWORD || 'guest',
         username: process.env.RMQ_USERNAME || 'guest',
     },
+    validator: {
+        user: {
+            id: /^t.*@.*/i,
+            firstname: {
+                minLength: 2,
+                maxLength: 20,
+            },
+            lastname: {
+                minLength: 2,
+                maxLength: 20,
+            },
+            email: /.*@.*/i,
+        },
+    },
     server: {
-        port:  +(process.env.PORT || 3000),
+        port: +(process.env.PORT || 3000),
         name: 'user',
     },
     cors: {
