@@ -6,16 +6,8 @@ export class UserManager {
         return UserRepository.create(user);
     }
 
-    static createMany(users: IUser[]) {
-        return UserRepository.createMany(users);
-    }
-
     static updateById(id: string, user: Partial<IUser>) {
         return UserRepository.updateById(id, user);
-    }
-
-    static updateMany(userFilter: Partial<IUser>, user: Partial<IUser>) {
-        return UserRepository.updateMany(userFilter, user);
     }
 
     static deleteById(id: string) {
