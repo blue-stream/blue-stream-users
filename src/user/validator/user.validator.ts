@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserValidations } from './user.validations';
-import { PropertyInvalidError, IdInvalidError, NameInvalidError, MailInvalidError } from '../../utils/errors/userErrors';
+import { IdInvalidError, NameInvalidError, MailInvalidError } from '../../utils/errors/userErrors';
 import { IUser } from '../user.interface';
 
 export class UserValidator {
@@ -8,13 +8,14 @@ export class UserValidator {
     static canCreate(req: Request, res: Response, next: NextFunction) {
         next(
             UserValidator.validateId(req.body.id) ||
-            UserValidator.vali);
+            UserValidator.validateName(req.body.firstname, req.body.lastname) ||
+            UserValidator.validateMail(req.body.mail));
     }
 
     static canUpdateById(req: Request, res: Response, next: NextFunction) {
         next(
             UserValidator.validateId(req.params.id) ||
-            UserValidator.validateProperty(req.body.property));
+            UserValidator.validatePartialUser(req.body));
     }
 
     static canDeleteById(req: Request, res: Response, next: NextFunction) {
@@ -54,15 +55,19 @@ export class UserValidator {
         return undefined;
     }
 
-    private static getNextValueFromArray(validationsArray: (Error | undefined)[]) {
-        let nextValue: Error | undefined;
-
-        for (let index = 0; index < validationsArray.length; index++) {
-            if (validationsArray[index] !== undefined) {
-                nextValue = validationsArray[index];
-            }
+    private static validateMail(mail: string) {
+        if (!UserValidations.isMailValid(mail)) {
+            return new MailInvalidError();
         }
 
-        return nextValue;
+        return undefined;
+    }
+
+    private static validatePartialUser(user: Partial<IUser>) {
+        if (user.firstName && !UserValidations.isFirstnameValid(user.firstName)) return new NameInvalidError('firstname is invalid');
+        if (user.lastName && !UserValidations.isLastnameValid(user.lastName)) return new NameInvalidError('lastName is invalid');
+        if (user.mail && !UserValidations.isMailValid(user.mail)) return new MailInvalidError();
+
+        return undefined;
     }
 }
