@@ -16,22 +16,22 @@ export class ValidRequestMocks {
 
     readonly user: IUser = {
         _id: this.validId,
-        firstName: 'firstname1',
-        lastName: 'lastname1',
+        firstName: 'firstnameone',
+        lastName: 'lastnameone',
         mail: this.validMail,
     };
 
     readonly user2: IUser = {
         _id: this.validId2,
-        firstName: 'firstname2',
-        lastName: 'lastname2',
+        firstName: 'firstnametwo',
+        lastName: 'lastnametwo',
         mail: this.validMail2,
     };
 
     readonly user3: IUser = {
         _id: this.validId3,
-        firstName: 'firstname3',
-        lastName: 'lastname3',
+        firstName: 'firstnamethree',
+        lastName: 'lastnamethree',
         mail: this.validMail3,
     };
 
