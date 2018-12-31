@@ -25,7 +25,7 @@ const userSchema: mongoose.Schema = new mongoose.Schema(
                 validator: UserValidations.isLastnameValid,
             },
         },
-        email: {
+        mail: {
             type: String,
             required: true,
             validate: {
@@ -37,6 +37,7 @@ const userSchema: mongoose.Schema = new mongoose.Schema(
     {
         versionKey: false,
         autoIndex: false,
+        id: true,
         timestamps: true,
         toJSON: {
             virtuals: true,
