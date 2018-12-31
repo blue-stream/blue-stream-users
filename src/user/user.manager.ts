@@ -22,8 +22,8 @@ export class UserManager {
         return UserRepository.getOne(userFilter);
     }
 
-    static getMany(userFilter: Partial<IUser>) {
-        return UserRepository.getMany(userFilter);
+    static getMany(userFilter: Partial<IUser>, startIndex: number, endIndex: number, sortOrder: string = '-', sortBy: string = 'createdAt') {
+        return UserRepository.getMany(userFilter, startIndex, endIndex, sortOrder, sortBy);
     }
 
     static getAmount(userFilter: Partial<IUser>) {
