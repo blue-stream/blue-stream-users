@@ -7,8 +7,8 @@ export class UserValidator {
 
     static canCreate(req: Request, res: Response, next: NextFunction) {
         next(
-            UserValidator.validateId(req.body.id) ||
-            UserValidator.validateName(req.body.firstname, req.body.lastname) ||
+            UserValidator.validateId(req.body._id) ||
+            UserValidator.validateName(req.body.firstName, req.body.lastName) ||
             UserValidator.validateMail(req.body.mail));
     }
 
@@ -46,9 +46,9 @@ export class UserValidator {
         return undefined;
     }
 
-    private static validateName(firstname: string, lastname: string) {
-        if (!UserValidations.isFirstnameValid(firstname) ||
-            !UserValidations.isLastnameValid(lastname)) {
+    private static validateName(firstName: string, lastName: string) {
+        if (!UserValidations.isFirstnameValid(firstName) ||
+            !UserValidations.isLastnameValid(lastName)) {
             return new NameInvalidError();
         }
 
@@ -64,9 +64,9 @@ export class UserValidator {
     }
 
     private static validatePartialUser(user: Partial<IUser>) {
-        if (user.firstName && !UserValidations.isFirstnameValid(user.firstName)) return new NameInvalidError('firstname is invalid');
-        if (user.lastName && !UserValidations.isLastnameValid(user.lastName)) return new NameInvalidError('lastName is invalid');
-        if (user.mail && !UserValidations.isMailValid(user.mail)) return new MailInvalidError();
+        if (!user.firstName || !UserValidations.isFirstnameValid(user.firstName)) return new NameInvalidError('firstname is invalid');
+        if (!user.lastName || !UserValidations.isLastnameValid(user.lastName)) return new NameInvalidError('lastName is invalid');
+        if (!user.mail || !UserValidations.isMailValid(user.mail)) return new MailInvalidError();
 
         return undefined;
     }
