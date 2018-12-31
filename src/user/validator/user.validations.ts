@@ -7,24 +7,32 @@ export class UserValidations {
     }
 
     static isFirstnameValid(firstname: string): boolean {
-        return (UserValidations.isPropertyExsists(firstname) &&
+        return (
+            UserValidations.isPropertyExsists(firstname) &&
             firstname.length >= config.validator.user.firstname.minLength &&
             firstname.length <= config.validator.user.firstname.maxLength
         );
     }
 
     static isLastnameValid(lastname: string): boolean {
-        return (UserValidations.isPropertyExsists(lastname) &&
+        return (
+            UserValidations.isPropertyExsists(lastname) &&
             lastname.length >= config.validator.user.lastname.minLength &&
             lastname.length <= config.validator.user.lastname.maxLength
         );
     }
 
     static isMailValid(mail: string): boolean {
-        return (config.validator.user.email.test(mail));
+        return (
+            UserValidations.isPropertyExsists(mail) &&
+            config.validator.user.email.test(mail)
+        );
     }
 
     static isIdValid(id: string): boolean {
-        return (config.validator.user.id.test(id));
+        return (
+            UserValidations.isPropertyExsists(id) &&
+            config.validator.user.id.test(id)
+        );
     }
 }
