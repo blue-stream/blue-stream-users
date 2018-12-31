@@ -25,11 +25,11 @@ export const config = {
             id: /^[\w-]+$/,
             firstname: {
                 minLength: 2,
-                maxLength: 20,
+                maxLength: 15,
             },
             lastname: {
                 minLength: 2,
-                maxLength: 20,
+                maxLength: 15,
             },
             email: /^[\w.-]+\@[\w.-]+$/i,
         },
