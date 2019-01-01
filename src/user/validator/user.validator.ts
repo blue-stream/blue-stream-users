@@ -26,10 +26,6 @@ export class UserValidator {
         next(UserValidator.validateId(req.params.id));
     }
 
-    static canGetOne(req: Request, res: Response, next: NextFunction) {
-        next();
-    }
-
     static canGetMany(req: Request, res: Response, next: NextFunction) {
         next();
     }
