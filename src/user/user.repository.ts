@@ -1,5 +1,6 @@
 import { IUser } from './user.interface';
 import { UserModel } from './user.model';
+import { config } from '../config';
 import { ServerError } from '../utils/errors/applicationError';
 
 export class UserRepository {
@@ -19,14 +20,12 @@ export class UserRepository {
         return UserModel.findById(id).exec();
     }
 
-    static getOne(userFilter: Partial<IUser>): Promise<IUser | null> {
-        if (Object.keys(userFilter).length === 0) {
-            throw new ServerError('Filter is required.');
-        }
-        return UserModel.findOne(userFilter).exec();
-    }
-
-    static getMany(userFilter: Partial<IUser>, startIndex: number, endIndex: number, sortOrder: string = '-', sortBy: string = 'createdAt'): Promise<IUser[]> {
+    static getMany(
+        userFilter: Partial<IUser>,
+        startIndex: number = config.router.getMany.startIndex,
+        endIndex: number = config.router.getMany.endIndex,
+        sortOrder: string = config.router.getMany.sortOrder,
+        sortBy: string = config.router.getMany.sortBy): Promise<IUser[]> {
         return UserModel
             .find(userFilter)
             .sort(sortOrder + sortBy)
