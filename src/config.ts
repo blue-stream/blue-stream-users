@@ -38,6 +38,14 @@ export const config = {
         port: +(process.env.PORT || 3000),
         name: 'user',
     },
+    router: {
+        getMany: {
+            startIndex: 0,
+            endIndex: 20,
+            sortOrder: '-',
+            sortBy: 'createdAt',
+        },
+    },
     cors: {
         allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:4200'],
     },
