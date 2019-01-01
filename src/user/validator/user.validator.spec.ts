@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { UserValidator } from './user.validator';
+import { config } from '../../config';
 import { ValidRequestMocks, responseMock } from './user.mocks';
 import { IdInvalidError, MailInvalidError, NameInvalidError } from '../../utils/errors/userErrors';
 
@@ -16,7 +17,7 @@ describe('User Validator Middleware', function () {
         context('When invalid arguments are passed', function () {
             it('Should throw an IdInvalidError When Id is undefined', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body.property = undefined;
+                invalidRequestMock.body._id = undefined;
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -26,7 +27,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an IdInvalidError When Id is null', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body.property = null;
+                invalidRequestMock.body._id = null;
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -66,7 +67,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an NameInvalidError When firstname is too short', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body.firstName = 'a';
+                invalidRequestMock.body.firstName = 'a'.repeat(config.validator.user.firstname.minLength - 1);
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -76,7 +77,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an NameInvalidError When firstname is too long', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body._id = 'a'.repeat(20);
+                invalidRequestMock.body.firstName = 'a'.repeat(config.validator.user.firstname.maxLength + 1);
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -106,7 +107,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an NameInvalidError When lastname is too short', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body.lastName = 'a';
+                invalidRequestMock.body.lastName = 'a'.repeat(config.validator.user.lastname.minLength - 1);
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -116,7 +117,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an NameInvalidError When lastname is too long', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body.lastName = 'a'.repeat(20);
+                invalidRequestMock.body.lastName = 'a'.repeat(config.validator.user.lastname.maxLength + 1);
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -130,20 +131,29 @@ describe('User Validator Middleware', function () {
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(NameInvalidError);
+                    expect(error).to.be.an.instanceof(MailInvalidError);
                 });
             });
 
             it('Should throw an MailInvalidError When mail is null', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body.lastName = null;
+                invalidRequestMock.body.mail = null;
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(NameInvalidError);
+                    expect(error).to.be.an.instanceof(MailInvalidError);
                 });
             });
 
+            it('Should throw an MailInvalidError When mail is indalid', function () {
+                const invalidRequestMock = new ValidRequestMocks().create;
+                invalidRequestMock.body.mail = 'Tasadas234';
+
+                UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(MailInvalidError);
+                });
+            });
 
         });
     });
@@ -158,33 +168,113 @@ describe('User Validator Middleware', function () {
         });
 
         context('When invalid arguments are passed', function () {
-            it('Should throw an PropertyInvalidError When property is undefined', function () {
+            it('Should throw an NameInvalidError When firstname is undefined', function () {
                 const invalidRequestMock = new ValidRequestMocks().updateById;
-                invalidRequestMock.body.property = undefined;
+                invalidRequestMock.body.firstName = undefined;
 
                 UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
+                    expect(error).to.be.an.instanceof(NameInvalidError);
                 });
             });
 
-            it('Should throw an PropertyInvalidError When property is null', function () {
+            it('Should throw an NameInvalidError When firstname is null', function () {
                 const invalidRequestMock = new ValidRequestMocks().updateById;
-                invalidRequestMock.body.property = null;
+                invalidRequestMock.body.firstName = null;
 
                 UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
+                    expect(error).to.be.an.instanceof(NameInvalidError);
                 });
             });
 
-            it('Should throw an PropertyInvalidError When property is too long', function () {
+            it('Should throw an NameInvalidError When firstname is too long', function () {
                 const invalidRequestMock = new ValidRequestMocks().updateById;
-                invalidRequestMock.body.property = '2142142142141241';
+                invalidRequestMock.body.firstName = 'a'.repeat(config.validator.user.firstname.maxLength + 1);
 
                 UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
-                    expect(error).to.be.an.instanceof(PropertyInvalidError);
+                    expect(error).to.be.an.instanceof(NameInvalidError);
+                });
+            });
+
+            it('Should throw an NameInvalidError When firstname is too short', function () {
+                const invalidRequestMock = new ValidRequestMocks().updateById;
+                invalidRequestMock.body.firstName = 'a'.repeat(config.validator.user.firstname.minLength - 1);
+
+                UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(NameInvalidError);
+                });
+            });
+
+            it('Should throw an NameInvalidError When lastname is undefined', function () {
+                const invalidRequestMock = new ValidRequestMocks().updateById;
+                invalidRequestMock.body.lastName = undefined;
+
+                UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(NameInvalidError);
+                });
+            });
+
+            it('Should throw an NameInvalidError When lastname is null', function () {
+                const invalidRequestMock = new ValidRequestMocks().updateById;
+                invalidRequestMock.body.lastName = null;
+
+                UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(NameInvalidError);
+                });
+            });
+
+            it('Should throw an NameInvalidError When lastname is too long', function () {
+                const invalidRequestMock = new ValidRequestMocks().updateById;
+                invalidRequestMock.body.lastName = 'a'.repeat(config.validator.user.lastname.maxLength + 1);
+
+                UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(NameInvalidError);
+                });
+            });
+
+            it('Should throw an NameInvalidError When lastname is too short', function () {
+                const invalidRequestMock = new ValidRequestMocks().updateById;
+                invalidRequestMock.body.lastName = 'a'.repeat(config.validator.user.lastname.minLength - 1);
+
+                UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(NameInvalidError);
+                });
+            });
+
+            it('Should throw an MailInvalidError When mail is undefined', function () {
+                const invalidRequestMock = new ValidRequestMocks().updateById;
+                invalidRequestMock.body.mail = undefined;
+
+                UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(MailInvalidError);
+                });
+            });
+
+            it('Should throw an MailInvalidError When mail is null', function () {
+                const invalidRequestMock = new ValidRequestMocks().updateById;
+                invalidRequestMock.body.mail = null;
+
+                UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(MailInvalidError);
+                });
+            });
+
+            it('Should throw an MailInvalidError When mail is invalid', function () {
+                const invalidRequestMock = new ValidRequestMocks().updateById;
+                invalidRequestMock.body.mail = 'Tasdas334';
+
+                UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
+                    expect(error).to.exist;
+                    expect(error).to.be.an.instanceof(MailInvalidError);
                 });
             });
 
@@ -208,9 +298,9 @@ describe('User Validator Middleware', function () {
                 });
             });
 
-            it('Should throw an IdInvalidError When id is not a valid ObjectID', function () {
+            it('Should throw an IdInvalidError When id is invalid', function () {
                 const invalidRequestMock = new ValidRequestMocks().updateById;
-                invalidRequestMock.params.id = '1244';
+                invalidRequestMock.params.id = 'Tasd342.432';
 
                 UserValidator.canUpdateById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -242,7 +332,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an IdInvalidError When id is null', function () {
                 const invalidRequestMock = new ValidRequestMocks().deleteById;
-                invalidRequestMock.params.id = undefined;
+                invalidRequestMock.params.id = null;
 
                 UserValidator.canDeleteById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -250,9 +340,9 @@ describe('User Validator Middleware', function () {
                 });
             });
 
-            it('Should throw an IdInvalidError When id is not a valid ObjectID', function () {
+            it('Should throw an IdInvalidError When id is invalid', function () {
                 const invalidRequestMock = new ValidRequestMocks().deleteById;
-                invalidRequestMock.params.id = '1243';
+                invalidRequestMock.params.id = 'T342sdf.asd';
 
                 UserValidator.canDeleteById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -292,23 +382,13 @@ describe('User Validator Middleware', function () {
                 });
             });
 
-            it('Should throw an IdInvalidError When id is not a valid ObjectID', function () {
+            it('Should throw an IdInvalidError When id is invalid', function () {
                 const invalidRequestMock = new ValidRequestMocks().getById;
-                invalidRequestMock.params.id = '1234';
+                invalidRequestMock.params.id = 'ASEkjsd983@as';
 
                 UserValidator.canGetById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
                     expect(error).to.be.an.instanceof(IdInvalidError);
-                });
-            });
-        });
-    });
-
-    describe('canGetOne Validator', function () {
-        context('When valid arguments are passed', function () {
-            it('Should not throw an error', function () {
-                UserValidator.canGetOne(new ValidRequestMocks().getOne, responseMock, (error: Error) => {
-                    expect(error).to.not.exist;
                 });
             });
         });
