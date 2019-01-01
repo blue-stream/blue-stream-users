@@ -35,15 +35,6 @@ export class UserController {
         res.json(user);
     }
 
-    static async getOne(req: Request, res: Response) {
-        const user = await UserManager.getOne(req.query);
-        if (!user) {
-            throw new UserNotFoundError();
-        }
-
-        res.json(user);
-    }
-
     static async getMany(req: Request, res: Response) {
         let sortOrder: string;
         let sortBy: string;
@@ -65,7 +56,7 @@ export class UserController {
                 undefined && delete userFilter[key as keyof IUser];
         });
 
-        res.json(await UserManager.getMany(req.query, startIndex, endIndex, sortOrder, sortBy));
+        res.json(await UserManager.getMany(userFilter, startIndex, endIndex, sortOrder, sortBy));
     }
 
     static async getAmount(req: Request, res: Response) {

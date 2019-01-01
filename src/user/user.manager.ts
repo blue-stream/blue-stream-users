@@ -18,11 +18,7 @@ export class UserManager {
         return UserRepository.getById(id);
     }
 
-    static getOne(userFilter: Partial<IUser>) {
-        return UserRepository.getOne(userFilter);
-    }
-
-    static getMany(userFilter: Partial<IUser>, startIndex: number, endIndex: number, sortOrder: string = '-', sortBy: string = 'createdAt') {
+    static getMany(userFilter: Partial<IUser>, startIndex: number, endIndex: number, sortOrder: string, sortBy: string) {
         return UserRepository.getMany(userFilter, startIndex, endIndex, sortOrder, sortBy);
     }
 
