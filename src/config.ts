@@ -22,7 +22,7 @@ export const config = {
     },
     validator: {
         user: {
-            id: /^[\w-]+$/,
+            id: /^[\w-]+@[\w-]+$/,
             firstname: {
                 minLength: 2,
                 maxLength: 15,
@@ -31,7 +31,7 @@ export const config = {
                 minLength: 2,
                 maxLength: 15,
             },
-            email: /^[\w.-]+\@[\w.-]+$/i,
+            email: /^[\w-]+\@[\w-]+\.[\w-]+$/i,
         },
     },
     server: {
