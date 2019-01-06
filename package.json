@@ -8,7 +8,7 @@
     "test": "cross-env NODE_ENV=test mocha --recursive -r ts-node/register src/**/*.spec.ts --exit",
     "test:validation": "cross-env NODE_ENV=test mocha --recursive -r ts-node/register \"src/**/*.validator.spec.ts\" --exit",
     "test:integration": "cross-env NODE_ENV=test mocha --recursive -r ts-node/register \"src/**/*.router.spec.ts\" --exit",
-    "test:repository": "cross-env NODE_ENV=test mocha --recursive -r ts-node/register \"src/**/*.repository.spec.ts\" --exit",
+    "test:repository": "cross-env NODE_ENV=test mocha --recursive --timeout 5000 -r ts-node/register \"src/**/*.repository.spec.ts\" --exit",
     "test:coverage": "cross-env NODE_ENV=test nyc npm test",
     "coverage-test": "cross-env NODE_ENV=test nyc check-coverage --lines 95 --functions 95 --branches 95",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
