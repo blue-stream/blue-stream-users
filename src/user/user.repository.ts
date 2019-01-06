@@ -30,7 +30,7 @@ export class UserRepository {
             .find(userFilter)
             .sort(sortOrder + sortBy)
             .skip(+startIndex)
-            .limit(+endIndex - +startIndex)
+            .limit((+endIndex) - (+startIndex))
             .exec();
     }
 
