@@ -2,9 +2,10 @@ import * as request from 'supertest';
 import { expect } from 'chai';
 
 import * as mongoose from 'mongoose';
+import { UserRepository } from './user.repository';
 import { IUser } from './user.interface';
 import { Server } from '../server';
-import { IdInvalidError, UserNotFoundError } from '../utils/errors/userErrors';
+import { IdInvalidError, UserNotFoundError, NameInvalidError, MailInvalidError } from '../utils/errors/userErrors';
 import { config } from '../config';
 import { UserManager } from './user.manager';
 import { sign } from 'jsonwebtoken';
@@ -13,6 +14,11 @@ describe('User Router Module', function () {
     let server: Server;
     const validId: string = 'T234@245';
     const invalidId: string = 'TDAS234';
+    const invalidShortFirstname = 'a'.repeat(config.validator.user.firstname.minLength - 1);
+    const invalidLongFirstname = 'a'.repeat(config.validator.user.firstname.maxLength + 1);
+    const invalidShortLastname = 'b'.repeat(config.validator.user.firstname.minLength - 1);
+    const invalidLongLastname = 'b'.repeat(config.validator.user.firstname.maxLength + 1);
+    const invalidMail = 'T2asf5assaasd.sdf';
 
     const user: IUser = {
         _id: validId,
@@ -21,9 +27,23 @@ describe('User Router Module', function () {
         mail: 'T234245asa@asd.sdf',
     };
 
+    const user2: IUser = {
+        _id: 'asd@nnn',
+        firstName: 'firstnametwo',
+        lastName: 'lastnametwo',
+        mail: 'T245as@asd.sdf',
+    };
+
+    const user3: IUser = {
+        _id: 'asdasd@fff',
+        firstName: 'firstnameone',
+        lastName: 'lastnamethree',
+        mail: 'T234245@asd.sdf',
+    };
+
     const updatedUser: Partial<IUser> = {
-        firstName: 'updateFirstname',
-        lastName: 'updatelastname',
+        firstName: 'newFirstname',
+        lastName: 'newLastname',
         mail: 'AA@asd.sdf',
     };
 
@@ -31,13 +51,12 @@ describe('User Router Module', function () {
 
     const invalidIdUser: IUser = {
         _id: invalidId,
-        firstName: 'a'.repeat(config.validator.user.firstname.maxLength + 1),
-        lastName: 'a'.repeat(config.validator.user.lastname.minLength - 1),
-        mail: 'T2asf5assaasd.sdf',
+        firstName: invalidLongFirstname,
+        lastName: invalidShortLastname,
+        mail: invalidMail,
     };
 
-    // const users: IUser[] =
-    //     [user, user2, user3, user3];
+    const users: IUser[] = [user, user2, user3];
 
     before(async function () {
         await mongoose.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, { useNewUrlParser: true });
@@ -82,7 +101,7 @@ describe('User Router Module', function () {
                 await mongoose.connection.db.dropDatabase();
             });
 
-            it('Should return error status when id is invalid', function (done: MochaDone) {
+            it('Should return IdInvalidError when id is invalid', function (done: MochaDone) {
                 request(server.app)
                     .post('/api/user/')
                     .send(invalidIdUser)
@@ -101,12 +120,110 @@ describe('User Router Module', function () {
                     });
             });
 
-            // firstname too long
-            // firstname too short
-            // lastname too long
-            // lastname too short
-            // mail is invalid
-            // duplicate mail (not unique)
+            it('Should return NameInvalidError when firstName too short', function (done: MochaDone) {
+                const invalidFirstnameUser = { ...user };
+                invalidFirstnameUser.firstName = invalidShortFirstname;
+                request(server.app)
+                    .post('/api/user/')
+                    .send(invalidFirstnameUser)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', NameInvalidError.name);
+                        expect(res.body).to.have.property('message', new NameInvalidError().message);
+
+                        done();
+                    });
+            });
+
+            it('Should return NameInvalidError when firstName too long', function (done: MochaDone) {
+                const invalidFirstnameUser = { ...user };
+                invalidFirstnameUser.firstName = invalidLongFirstname;
+                request(server.app)
+                    .post('/api/user/')
+                    .send(invalidFirstnameUser)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', NameInvalidError.name);
+                        expect(res.body).to.have.property('message', new NameInvalidError().message);
+
+                        done();
+                    });
+            });
+
+            it('Should return NameInvalidError when lastName too short', function (done: MochaDone) {
+                const invalidLastnameUser = { ...user };
+                invalidLastnameUser.lastName = invalidShortLastname;
+                request(server.app)
+                    .post('/api/user/')
+                    .send(invalidLastnameUser)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', NameInvalidError.name);
+                        expect(res.body).to.have.property('message', new NameInvalidError().message);
+
+                        done();
+                    });
+            });
+
+            it('Should return NameInvalidError when lastName too long', function (done: MochaDone) {
+                const invalidLastnameUser = { ...user };
+                invalidLastnameUser.lastName = invalidLongLastname;
+                request(server.app)
+                    .post('/api/user/')
+                    .send(invalidLastnameUser)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', NameInvalidError.name);
+                        expect(res.body).to.have.property('message', new NameInvalidError().message);
+
+                        done();
+                    });
+            });
+
+            it('Should return MailInvalidError when mail is invalid', function (done: MochaDone) {
+                const invalidMailUser = { ...user };
+                invalidMailUser.mail = invalidMail;
+                request(server.app)
+                    .post('/api/user/')
+                    .send(invalidMailUser)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', MailInvalidError.name);
+                        expect(res.body).to.have.property('message', new MailInvalidError().message);
+
+                        done();
+                    });
+            });
         });
     });
 
@@ -141,9 +258,9 @@ describe('User Router Module', function () {
                     });
             });
 
-            it('Should return error status when id is not found', function (done: MochaDone) {
+            it('Should return UserNotFoundError when id is not found', function (done: MochaDone) {
                 request(server.app)
-                    .put(`/api/user/${new mongoose.Types.ObjectId()}`)
+                    .put('/api/user/aa@aa')
                     .send(user)
                     .set({ authorization: authorizationHeader })
                     .expect(404)
@@ -167,7 +284,7 @@ describe('User Router Module', function () {
                 returnedUser = await UserManager.create(user);
             });
 
-            it('Should return error status when id is invalid', function (done: MochaDone) {
+            it('Should return IdInvalidError when id is invalid', function (done: MochaDone) {
                 request(server.app)
                     .put('/api/user/2')
                     .send(user)
@@ -186,10 +303,12 @@ describe('User Router Module', function () {
                     });
             });
 
-            it('Should return error status when property is invalid', function (done: MochaDone) {
+            it('Should return NameInvalidError when firstname is too long', function (done: MochaDone) {
+                const invalidFirstnameUser = { ...user };
+                invalidFirstnameUser.firstName = invalidLongFirstname;
                 request(server.app)
                     .put(`/api/user/${returnedUser.id}`)
-                    .send(invalidUser)
+                    .send(invalidFirstnameUser)
                     .set({ authorization: authorizationHeader })
                     .expect(400)
                     .expect('Content-Type', /json/)
@@ -198,8 +317,67 @@ describe('User Router Module', function () {
                         expect(res.status).to.equal(400);
                         expect(res).to.have.property('body');
                         expect(res.body).to.be.an('object');
-                        expect(res.body).to.have.property('type', PropertyInvalidError.name);
-                        expect(res.body).to.have.property('message', new PropertyInvalidError().message);
+                        expect(res.body).to.have.property('type', NameInvalidError.name);
+
+                        done();
+                    });
+            });
+
+            it('Should return error status when firstname is too short', function (done: MochaDone) {
+                const invalidFirstnameUser = { ...user };
+                invalidFirstnameUser.firstName = invalidShortFirstname;
+                request(server.app)
+                    .put(`/api/user/${returnedUser.id}`)
+                    .send(invalidFirstnameUser)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', NameInvalidError.name);
+
+                        done();
+                    });
+            });
+
+            it('Should return error status when lastname is too long', function (done: MochaDone) {
+                const invalidLastnameUser = { ...user };
+                invalidLastnameUser.lastName = invalidLongLastname;
+                request(server.app)
+                    .put(`/api/user/${returnedUser.id}`)
+                    .send(invalidLastnameUser)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', NameInvalidError.name);
+
+                        done();
+                    });
+            });
+
+            it('Should return MailInvalidError when mail is invalid', function (done: MochaDone) {
+                const invalidMailUser = { ...user };
+                invalidMailUser.mail = invalidMail;
+                request(server.app)
+                    .put(`/api/user/${returnedUser.id}`)
+                    .send(invalidMailUser)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', MailInvalidError.name);
 
                         done();
                     });
@@ -207,132 +385,170 @@ describe('User Router Module', function () {
         });
     });
 
-    // describe('#GET /api/user/many', function () {
-    //     let returnedUsers: any;
+    describe('#GET /api/user/:id', function () {
+        let returnedUser: any;
 
-    //     context('When request is valid', function () {
-    //         beforeEach(async function () {
-    //             await mongoose.connection.db.dropDatabase();
-    //             returnedUsers = await UserManager.createMany(users);
-    //         });
+        context('When request is valid', function () {
+            beforeEach(async function () {
+                await mongoose.connection.db.dropDatabase();
+                returnedUser = await UserManager.create(user);
+            });
 
-    //         it('Should return user', function (done: MochaDone) {
-    //             request(server.app)
-    //                 .get(`/api/user/many?property=${user3.property}`)
-    //                 .set({ authorization: authorizationHeader })
-    //                 .expect(200)
-    //                 .expect('Content-Type', /json/)
-    //                 .end((error: Error, res: request.Response) => {
-    //                     expect(error).to.not.exist;
-    //                     expect(res).to.exist;
-    //                     expect(res.status).to.equal(200);
-    //                     expect(res).to.have.property('body');
-    //                     expect(res.body).to.be.an('array');
-    //                     expect(res.body[1]).to.have.property('property', users[2].property);
+            it('Should return user', function (done: MochaDone) {
+                request(server.app)
+                    .get(`/api/user/${returnedUser.id}`)
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('id', user._id);
+                        expect(res.body).to.have.property('firstName', user.firstName);
+                        expect(res.body).to.have.property('lastName', user.lastName);
+                        expect(res.body).to.have.property('mail', user.mail);
 
-    //                     done();
-    //                 });
-    //         });
-    //     });
-    // });
+                        done();
+                    });
+            });
 
-    // describe('#GET /api/user/amount', function () {
-    //     let returnedUsers: any;
+            it('Should return UserNotFoundError when user not found', function (done: MochaDone) {
+                request(server.app)
+                    .get('/api/user/aa@aa')
+                    .set({ authorization: authorizationHeader })
+                    .expect(404)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(404);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', UserNotFoundError.name);
+                        expect(res.body).to.have.property('message', new UserNotFoundError().message);
 
-    //     context('When request is valid', function () {
-    //         beforeEach(async function () {
-    //             await mongoose.connection.db.dropDatabase();
-    //             returnedUsers = await UserManager.createMany(users);
-    //         });
+                        done();
+                    });
+            });
+        });
 
-    //         it('Should return user', function (done: MochaDone) {
-    //             request(server.app)
-    //                 .get(`/api/user/amount?property=${user3.property}`)
-    //                 .set({ authorization: authorizationHeader })
-    //                 .expect(200)
-    //                 .expect('Content-Type', /json/)
-    //                 .end((error: Error, res: request.Response) => {
-    //                     expect(error).to.not.exist;
-    //                     expect(res).to.exist;
-    //                     expect(res.status).to.equal(200);
-    //                     expect(res).to.have.property('body');
-    //                     expect(res.body).be.equal(2);
+        context('When request is invalid', function () {
+            beforeEach(async function () {
+                await mongoose.connection.db.dropDatabase();
+                returnedUser = await UserManager.create(user);
+            });
 
-    //                     done();
-    //                 });
-    //         });
-    //     });
-    // });
+            it('Should return error status when id is invalid', function (done: MochaDone) {
+                request(server.app)
+                    .get(`/api/user/${invalidId}`)
+                    .set({ authorization: authorizationHeader })
+                    .expect(400)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res.status).to.equal(400);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('type', IdInvalidError.name);
+                        expect(res.body).to.have.property('message', new IdInvalidError().message);
 
-    // describe('#GET /api/user/:id', function () {
-    //     let returnedUser: any;
+                        done();
+                    });
+            });
+        });
+    });
 
-    //     context('When request is valid', function () {
-    //         beforeEach(async function () {
-    //             await mongoose.connection.db.dropDatabase();
-    //             returnedUser = await UserManager.create(user);
-    //         });
+    describe('#GET /api/user/many', function () {
+        context('When request is valid', function () {
+            beforeEach(async function () {
+                await mongoose.connection.db.dropDatabase();
+                return Promise.all(users.map(user => UserManager.create(user)));
+            });
 
-    //         it('Should return user', function (done: MochaDone) {
-    //             request(server.app)
-    //                 .get(`/api/user/${returnedUser.id}`)
-    //                 .set({ authorization: authorizationHeader })
-    //                 .expect(200)
-    //                 .expect('Content-Type', /json/)
-    //                 .end((error: Error, res: request.Response) => {
-    //                     expect(error).to.not.exist;
-    //                     expect(res).to.exist;
-    //                     expect(res.status).to.equal(200);
-    //                     expect(res).to.have.property('body');
-    //                     expect(res.body).to.be.an('object');
-    //                     expect(res.body).to.have.property('property', user.property);
+            it('Should return users matching the filter', function (done: MochaDone) {
+                request(server.app)
+                    .get(`/api/user/many?firstName=${user.firstName}`)
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('array');
+                        expect(res.body[0]).to.exist;
+                        expect(res.body[0]).to.have.property('firstName');
+                        expect(res.body[0].firstName).to.be.equal(user.firstName);
+                        expect(res.body[1]).to.exist;
+                        expect(res.body[1]).to.have.property('firstName');
+                        expect(res.body[1].firstName).to.be.equal(user.firstName);
 
-    //                     done();
-    //                 });
-    //         });
+                        done();
+                    });
+            });
 
-    //         it('Should return error when user not found', function (done: MochaDone) {
-    //             request(server.app)
-    //                 .get(`/api/user/${new mongoose.Types.ObjectId()}`)
-    //                 .set({ authorization: authorizationHeader })
-    //                 .expect(404)
-    //                 .expect('Content-Type', /json/)
-    //                 .end((error: Error, res: request.Response) => {
-    //                     expect(res).to.exist;
-    //                     expect(res.status).to.equal(404);
-    //                     expect(res).to.have.property('body');
-    //                     expect(res.body).to.be.an('object');
-    //                     expect(res.body).to.have.property('type', UserNotFoundError.name);
-    //                     expect(res.body).to.have.property('message', new UserNotFoundError().message);
+            it('Should return empty array for non matching the filter', function (done: MochaDone) {
+                request(server.app)
+                    .get('/api/user/many?firstName=unexistingFirstname')
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('array').empty;
 
-    //                     done();
-    //                 });
-    //         });
-    //     });
+                        done();
+                    });
+            });
+        });
+    });
 
-    //     context('When request is invalid', function () {
-    //         beforeEach(async function () {
-    //             await mongoose.connection.db.dropDatabase();
-    //             returnedUser = await UserManager.create(user);
-    //         });
+    describe('#GET /api/user/amount', function () {
+        context('When request is valid', function () {
+            beforeEach(async function () {
+                await mongoose.connection.db.dropDatabase();
+                return Promise.all(users.map(user => UserManager.create(user)));
+            });
 
-    //         it('Should return error status when id is invalid', function (done: MochaDone) {
-    //             request(server.app)
-    //                 .get(`/api/user/${invalidId}`)
-    //                 .set({ authorization: authorizationHeader })
-    //                 .expect(400)
-    //                 .expect('Content-Type', /json/)
-    //                 .end((error: Error, res: request.Response) => {
-    //                     expect(error).to.not.exist;
-    //                     expect(res.status).to.equal(400);
-    //                     expect(res).to.have.property('body');
-    //                     expect(res.body).to.be.an('object');
-    //                     expect(res.body).to.have.property('type', IdInvalidError.name);
-    //                     expect(res.body).to.have.property('message', new IdInvalidError().message);
+            it('Should return number of found users by firstName property', function (done: MochaDone) {
+                request(server.app)
+                    .get(`/api/user/amount?firstName=${user.firstName}`)
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).be.equal(2);
 
-    //                     done();
-    //                 });
-    //         });
-    //     });
-    // });
+                        done();
+                    });
+            });
+
+            it('Should return 0 for non found users', function (done: MochaDone) {
+                request(server.app)
+                    .get('/api/user/amount?id=aa@aa')
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).be.equal(0);
+
+                        done();
+                    });
+            });
+        });
+    });
 });
