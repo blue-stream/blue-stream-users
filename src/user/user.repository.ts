@@ -22,10 +22,11 @@ export class UserRepository {
 
     static getMany(
         userFilter: Partial<IUser>,
-        startIndex: number = config.router.getMany.startIndex,
-        endIndex: number = config.router.getMany.endIndex,
-        sortOrder: string = config.router.getMany.sortOrder,
-        sortBy: string = config.router.getMany.sortBy): Promise<IUser[]> {
+        startIndex: number = config.pagination.startIndex,
+        endIndex: number = config.pagination.endIndex,
+        sortOrder: string = config.sort.sortOrder,
+        sortBy: string = config.sort.sortBy,
+    ): Promise<IUser[]> {
         return UserModel
             .find(userFilter)
             .sort(sortOrder + sortBy)
