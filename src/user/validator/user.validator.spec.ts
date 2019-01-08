@@ -384,7 +384,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an IdInvalidError When id is invalid', function () {
                 const invalidRequestMock = new ValidRequestMocks().getById;
-                invalidRequestMock.params.id = 'ASEkjsd983@as';
+                invalidRequestMock.params.id = 'ASEk.jsd983@as';
 
                 UserValidator.canGetById(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
