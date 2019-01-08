@@ -2,13 +2,9 @@ import { Types } from 'mongoose';
 import { config } from '../../config';
 
 export class UserValidations {
-    static isPropertyExsists(property: string): boolean {
-        return (!!property);
-    }
-
     static isFirstnameValid(firstname: string): boolean {
         return (
-            UserValidations.isPropertyExsists(firstname) &&
+            (!!firstname) &&
             firstname.length >= config.validator.user.firstname.minLength &&
             firstname.length <= config.validator.user.firstname.maxLength
         );
@@ -16,7 +12,7 @@ export class UserValidations {
 
     static isLastnameValid(lastname: string): boolean {
         return (
-            UserValidations.isPropertyExsists(lastname) &&
+            (!!lastname) &&
             lastname.length >= config.validator.user.lastname.minLength &&
             lastname.length <= config.validator.user.lastname.maxLength
         );
@@ -24,14 +20,14 @@ export class UserValidations {
 
     static isMailValid(mail: string): boolean {
         return (
-            UserValidations.isPropertyExsists(mail) &&
+            (!!mail) &&
             config.validator.user.email.test(mail)
         );
     }
 
     static isIdValid(id: string): boolean {
         return (
-            UserValidations.isPropertyExsists(id) &&
+            (!!id) &&
             config.validator.user.id.test(id)
         );
     }
