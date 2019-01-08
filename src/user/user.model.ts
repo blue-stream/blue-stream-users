@@ -47,4 +47,8 @@ const userSchema: mongoose.Schema = new mongoose.Schema(
         },
     });
 
+userSchema.virtual('id').set(function (this: IUser & mongoose.Document, id: string) {
+    this._id = id;
+});
+
 export const UserModel = mongoose.model<IUser & mongoose.Document>('User', userSchema);

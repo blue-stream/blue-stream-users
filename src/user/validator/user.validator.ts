@@ -7,7 +7,7 @@ export class UserValidator {
 
     static canCreate(req: Request, res: Response, next: NextFunction) {
         next(
-            UserValidator.validateId(req.body._id) ||
+            UserValidator.validateId(req.body.id) ||
             UserValidator.validateName(req.body.firstName, req.body.lastName) ||
             UserValidator.validateMail(req.body.mail));
     }

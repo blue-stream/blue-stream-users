@@ -15,21 +15,21 @@ export class ValidRequestMocks {
     readonly validMail3: string = 'AG234@abc.abc';
 
     readonly user: IUser = {
-        _id: this.validId,
+        id: this.validId,
         firstName: 'firstnameone',
         lastName: 'lastnameone',
         mail: this.validMail,
     };
 
     readonly user2: IUser = {
-        _id: this.validId2,
+        id: this.validId2,
         firstName: 'firstnametwo',
         lastName: 'lastnametwo',
         mail: this.validMail2,
     };
 
     readonly user3: IUser = {
-        _id: this.validId3,
+        id: this.validId3,
         firstName: 'firstnamethree',
         lastName: 'lastnamethree',
         mail: this.validMail3,

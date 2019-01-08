@@ -17,7 +17,7 @@ describe('User Validator Middleware', function () {
         context('When invalid arguments are passed', function () {
             it('Should throw an IdInvalidError When Id is undefined', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body._id = undefined;
+                invalidRequestMock.body.id = undefined;
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -27,7 +27,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an IdInvalidError When Id is null', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body._id = null;
+                invalidRequestMock.body.id = null;
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;
@@ -37,7 +37,7 @@ describe('User Validator Middleware', function () {
 
             it('Should throw an IdInvalidError When Id is invalid', function () {
                 const invalidRequestMock = new ValidRequestMocks().create;
-                invalidRequestMock.body._id = 'T324A32.d';
+                invalidRequestMock.body.id = 'T324A32.d';
 
                 UserValidator.canCreate(invalidRequestMock, responseMock, (error: Error) => {
                     expect(error).to.exist;

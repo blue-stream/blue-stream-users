@@ -21,21 +21,21 @@ describe('User Router Module', function () {
     const invalidMail = 'T2asf5assaasd.sdf';
 
     const user: IUser = {
-        _id: validId,
+        id: validId,
         firstName: 'firstnameone',
         lastName: 'lastnameone',
         mail: 'T234245asa@asd.sdf',
     };
 
     const user2: IUser = {
-        _id: 'asd@nnn',
+        id: 'asd@nnn',
         firstName: 'firstnametwo',
         lastName: 'lastnametwo',
         mail: 'T245as@asd.sdf',
     };
 
     const user3: IUser = {
-        _id: 'asdasd@fff',
+        id: 'asdasd@fff',
         firstName: 'firstnameone',
         lastName: 'lastnamethree',
         mail: 'T234245@asd.sdf',
@@ -50,7 +50,7 @@ describe('User Router Module', function () {
     const authorizationHeader = `Bearer ${sign('mock-user', config.authentication.secret)}`;
 
     const invalidIdUser: IUser = {
-        _id: invalidId,
+        id: invalidId,
         firstName: invalidLongFirstname,
         lastName: invalidShortLastname,
         mail: invalidMail,
@@ -86,7 +86,7 @@ describe('User Router Module', function () {
                         expect(res.status).to.equal(200);
                         expect(res).to.have.property('body');
                         expect(res.body).to.be.an('object');
-                        expect(res.body).to.have.property('id', user._id);
+                        expect(res.body).to.have.property('id', user.id);
                         expect(res.body).to.have.property('firstName', user.firstName);
                         expect(res.body).to.have.property('lastName', user.lastName);
                         expect(res.body).to.have.property('mail', user.mail);
@@ -249,7 +249,7 @@ describe('User Router Module', function () {
                         expect(res.status).to.equal(200);
                         expect(res).to.have.property('body');
                         expect(res.body).to.be.an('object');
-                        expect(res.body).to.have.property('id', user._id);
+                        expect(res.body).to.have.property('id', user.id);
                         expect(res.body).to.have.property('firstName', updatedUser.firstName);
                         expect(res.body).to.have.property('lastName', updatedUser.lastName);
                         expect(res.body).to.have.property('mail', updatedUser.mail);
@@ -406,7 +406,7 @@ describe('User Router Module', function () {
                         expect(res.status).to.equal(200);
                         expect(res).to.have.property('body');
                         expect(res.body).to.be.an('object');
-                        expect(res.body).to.have.property('id', user._id);
+                        expect(res.body).to.have.property('id', user.id);
                         expect(res.body).to.have.property('firstName', user.firstName);
                         expect(res.body).to.have.property('lastName', user.lastName);
                         expect(res.body).to.have.property('mail', user.mail);
