@@ -9,7 +9,7 @@ export class UserController {
     }
 
     static async updateById(req: Request, res: Response) {
-        const updated = await UserManager.updateById(req.params.id, req.body.user);
+        const updated = await UserManager.updateById(req.params.id, req.body);
         if (!updated) {
             throw new UserNotFoundError();
         }
@@ -36,27 +36,26 @@ export class UserController {
     }
 
     static async getMany(req: Request, res: Response) {
-        let sortOrder: string;
-        let sortBy: string;
-        let startIndex: number;
-        let endIndex: number;
         const userFilter: Partial<IUser> = {
-            firstName: req.query.firstname,
-            lastName: req.query.lastname,
+            firstName: req.query.firstName,
+            lastName: req.query.lastName,
             mail: req.query.mail,
         };
-
-        req.query.startIndex ? startIndex = req.query.startIndex : startIndex = 0;
-        req.query.endIndex ? endIndex = req.query.endIndex : endIndex = 20;
-        req.query.sortOrder ? sortOrder = req.query.sortOrder : sortOrder = '-';
-        req.query.sortBy ? sortBy = req.query.sortBy : sortBy = 'createdAt';
 
         Object.keys(userFilter).forEach((key: string) => {
             return userFilter[key as keyof IUser] ===
                 undefined && delete userFilter[key as keyof IUser];
         });
 
-        res.json(await UserManager.getMany(userFilter, startIndex, endIndex, sortOrder, sortBy));
+        res.json(
+            await UserManager.getMany(
+                userFilter,
+                req.query.startIndex,
+                req.query.endIndex,
+                req.query.sortOrder,
+                req.query.sortBy,
+            ),
+        );
     }
 
     static async getAmount(req: Request, res: Response) {
