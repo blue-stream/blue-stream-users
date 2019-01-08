@@ -24,12 +24,12 @@ export const config = {
         user: {
             id: /^[\w-]+@[\w-]+$/,
             firstname: {
-                minLength: 2,
-                maxLength: 15,
+                minLength: +(process.env.USER_FIRSTNAME_MIN_LEN || 2),
+                maxLength: +(process.env.USER_FIRSTNAME_MAX_LEN || 15),
             },
             lastname: {
-                minLength: 2,
-                maxLength: 15,
+                minLength: +(process.env.USER_LASTNAME_MIN_LEN || 2),
+                maxLength: +(process.env.USER_LASTNAME_MAX_LEN || 15),
             },
             email: /^[\w-]+\@[\w-]+\.[\w-]+$/i,
         },
