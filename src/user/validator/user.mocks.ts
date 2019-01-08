@@ -7,11 +7,11 @@ import { IUser } from '../user.interface';
 export const responseMock = createResponse();
 
 export class ValidRequestMocks {
-    readonly validId: string = 't012';
-    readonly validMail: string = 't012@aaa';
-    readonly validId2: string = 'T2_34';
-    readonly validMail2: string = 'T2_34@abc.abc.iif';
-    readonly validId3: string = 'AG234';
+    readonly validId: string = 't012@aaa';
+    readonly validMail: string = 't012@aaa.sdf';
+    readonly validId2: string = 'T2_34E@ert';
+    readonly validMail2: string = 'T2-34@abc.abc.iif';
+    readonly validId3: string = 'AG234@aad';
     readonly validMail3: string = 'AG234@abc.abc';
 
     readonly user: IUser = {
