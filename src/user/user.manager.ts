@@ -1,21 +1,15 @@
 import { IUser } from './user.interface';
 import { UserRepository } from './user.repository';
+import { config } from '../config';
+
 export class UserManager {
 
     static create(user: IUser) {
         return UserRepository.create(user);
     }
 
-    static createMany(users: IUser[]) {
-        return UserRepository.createMany(users);
-    }
-
     static updateById(id: string, user: Partial<IUser>) {
         return UserRepository.updateById(id, user);
-    }
-
-    static updateMany(userFilter: Partial<IUser>, user: Partial<IUser>) {
-        return UserRepository.updateMany(userFilter, user);
     }
 
     static deleteById(id: string) {
@@ -26,12 +20,14 @@ export class UserManager {
         return UserRepository.getById(id);
     }
 
-    static getOne(userFilter: Partial<IUser>) {
-        return UserRepository.getOne(userFilter);
-    }
-
-    static getMany(userFilter: Partial<IUser>) {
-        return UserRepository.getMany(userFilter);
+    static getMany(userFilter: Partial<IUser>, startIndex?: number, endIndex?: number, sortOrder?: string, sortBy?: string) {
+        return UserRepository.getMany(
+            userFilter,
+            startIndex || config.pagination.startIndex,
+            endIndex || config.pagination.endIndex,
+            sortOrder || config.sort.sortOrder,
+            sortBy || config.sort.sortBy,
+        );
     }
 
     static getAmount(userFilter: Partial<IUser>) {

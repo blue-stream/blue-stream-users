@@ -4,20 +4,56 @@ import { config } from '../config';
 import { ServerError } from '../utils/errors/applicationError';
 import { IUser } from './user.interface';
 import { UserRepository } from './user.repository';
+import { UserValidations } from './validator/user.validations';
 
-const validId: string = new mongoose.Types.ObjectId().toHexString();
-const invalidId: string = 'invalid id';
+const validId: string = 'T234@245';
+const invalidId: string = 'ADSS234.ssd@df';
+const invalidFirstname: string = 'a';
+const invalidLastname: string = 'a'.repeat(config.validator.user.lastname.maxLength + 1);
+const invalidMail: string = 'Tasfd.sadf';
+
 const user: IUser = {
-    property: 'prop',
+    id: validId,
+    firstName: 'firstnameone',
+    lastName: 'lastnameone',
+    mail: 'T234245asa@asd.sdf',
 };
-const userArr: IUser[] = ['prop', 'prop', 'prop', 'b', 'c', 'd'].map(item => ({ property: item }));
-const invalidUser: any = {
-    property: { invalid: true },
+
+const sameUserNames: IUser = {
+    id: 'ADSFD@sss',
+    firstName: 'firstnameone',
+    lastName: 'lastnameone',
+    mail: 'ADSFD@sss.sdf',
 };
-const userFilter: Partial<IUser> = { property: 'prop' };
-const userDataToUpdate: Partial<IUser> = { property: 'updated' };
-const unexistingUser: Partial<IUser> = { property: 'unexisting' };
+
+const user2: IUser = {
+    id: 'T2AS34@245',
+    firstName: 'firstnametwo',
+    lastName: 'lastnametwo',
+    mail: 'T234245@asd.aaa',
+};
+
+const user3: IUser = {
+    id: 'Tasas323@9000',
+    firstName: 'firstnameone',
+    lastName: 'lastnamethree',
+    mail: 'T234245asa@asd.sdf',
+};
+
+const invalidUser: IUser = {
+    id: invalidId,
+    firstName: invalidFirstname,
+    lastName: invalidLastname,
+    mail: invalidMail,
+};
+
+const userFilter: Partial<IUser> = { firstName: 'firstnameone', lastName: 'lastnameone' };
+const userDataToUpdate: Partial<IUser> = { firstName: 'updateFirstname' };
+const unexistingUser: Partial<IUser> = { id: 'aa@aa' };
+const unexistingUserFilter: Partial<IUser> = { firstName: 'firstnameone', lastName: 'nonExistingLastname' };
 const unknownProperty: Object = { unknownProperty: true };
+
+const userArr: IUser[] = [user, user2, user3];
 
 describe('User Repository', function () {
     before(async function () {
@@ -37,33 +73,47 @@ describe('User Repository', function () {
             it('Should create user', async function () {
                 const createdUser = await UserRepository.create(user);
                 expect(createdUser).to.exist;
-                expect(createdUser).to.have.property('property', 'prop');
                 expect(createdUser).to.have.property('createdAt');
                 expect(createdUser).to.have.property('updatedAt');
-                expect(createdUser).to.have.property('_id').which.satisfies((id: any) => {
-                    return mongoose.Types.ObjectId.isValid(id);
+
+                for (const prop in user) {
+                    expectToHaveEqualProperty(createdUser, prop, user[prop as keyof IUser]);
+                }
+
+                expect(createdUser).to.have.property('id').which.satisfies((id: any) => {
+                    return UserValidations.isIdValid(id);
                 });
             });
         });
 
         context('When user is invalid', function () {
-            it('Should throw validation error when incorrect property type', async function () {
-                let hasThrown = false;
+            for (const prop in invalidUser) {
+                it(`Should throw validation error when incorrect ${prop} entered`, async function () {
+                    let hasThrown = false;
 
-                try {
-                    await UserRepository.create(invalidUser);
-                } catch (err) {
-                    hasThrown = true;
-                    expect(err).to.exist;
-                    expect(err).to.have.property('name', 'ValidationError');
-                    expect(err).to.have.property('message').that.matches(/cast.+failed/i);
-                    expect(err).to.have.property('errors');
-                    expect(err.errors).to.have.property('property');
-                    expect(err.errors.property).to.have.property('name', 'CastError');
-                } finally {
-                    expect(hasThrown).to.be.true;
-                }
-            });
+                    const invalidOnePropUser = {
+                        ...user,
+                    };
+
+                    invalidOnePropUser[prop as keyof IUser] = invalidUser[prop as keyof IUser];
+
+                    try {
+                        await UserRepository.create(invalidOnePropUser);
+                    } catch (err) {
+                        hasThrown = true;
+                        expect(err).to.exist;
+                        expect(err).to.have.property('name', 'ValidationError');
+                        expect(err).to.have.property('errors');
+                        if (prop === 'id') {
+                            expect(err.errors).to.have.property('_id');
+                        } else {
+                            expect(err.errors).to.have.property(prop);
+                        }
+                    } finally {
+                        expect(hasThrown).to.be.true;
+                    }
+                });
+            }
 
             it('Should throw validation error when empty user passed', async function () {
                 let hasThrown = false;
@@ -81,53 +131,13 @@ describe('User Repository', function () {
         });
     });
 
-    describe('#createMany()', function () {
-        context('When data is valid', function () {
-            it('Should create many documents', async function () {
-                const createdDocuments = await UserRepository.createMany(userArr);
-
-                expect(createdDocuments).to.exist;
-                expect(createdDocuments).to.be.an('array');
-                expect(createdDocuments).to.have.lengthOf(userArr.length);
-            });
-
-            it('Should not create documents when empty array passed', async function () {
-                const docs = await UserRepository.createMany([]);
-
-                expect(docs).to.exist;
-                expect(docs).to.be.an('array');
-                expect(docs).to.be.empty;
-            });
-        });
-
-        context('When data is invalid', function () {
-            it('Should throw error when 1 of the docs invalid', async function () {
-                let hasThrown = false;
-                const docs: IUser[] = [
-                    ...userArr,
-                    {} as IUser,
-                ];
-
-                try {
-                    await UserRepository.createMany(docs);
-                } catch (err) {
-                    hasThrown = true;
-                    expect(err).to.have.property('name', 'ValidationError');
-                    expect(err).to.have.property('message').that.matches(/path.+required/i);
-                } finally {
-                    expect(hasThrown).to.be.true;
-                }
-            });
-        });
-    });
-
     describe('#updateById()', function () {
 
         let createdUser: IUser;
 
         beforeEach(async function () {
             createdUser = await UserRepository.create(user);
-            expect(createdUser).have.property('id');
+            expect(createdUser).have.property('_id');
         });
 
         context('When data is valid', function () {
@@ -152,158 +162,32 @@ describe('User Repository', function () {
             });
 
             it('Should return null when updated doc does does not exist', async function () {
-                const updatedDoc = await UserRepository.updateById(new mongoose.Types.ObjectId().toHexString(), {});
+                const updatedDoc = await UserRepository.updateById('NonExistingId', {});
                 expect(updatedDoc).to.not.exist;
             });
         });
 
         context('When data is not valid', function () {
-            it('Should throw error when updated doc is not valid', async function () {
-                let hasThrown = false;
+            const invalidUserProps: Partial<IUser> = { ...invalidUser };
+            delete invalidUserProps.id;
 
-                try {
-                    await UserRepository.updateById(createdUser.id as string, { property: null } as any);
-                } catch (err) {
-                    hasThrown = true;
-                    expect(err).to.exist;
-                    expect(err).to.have.property('name', 'ValidationError');
-                    expect(err).to.have.property('message').that.matches(/path.+required/i);
-                } finally {
-                    expect(hasThrown).to.be.true;
-                }
-            });
-        });
-    });
+            for (const prop in invalidUserProps) {
+                it(`Should throw validation error when ${prop} is not valid`, async function () {
+                    let hasThrown = false;
 
-    describe('#updateMany()', function () {
-
-        beforeEach(async function () {
-            await UserRepository.createMany(userArr);
-        });
-
-        context('When data is valid', function () {
-
-            it('Should update many documents', async function () {
-                const updated = await UserRepository.updateMany(userFilter, userDataToUpdate);
-
-                const amountOfRequiredUpdates = userArr.filter((item: IUser) => {
-                    let match = true;
-                    for (const prop in userFilter) {
-                        match = match && item[prop as keyof IUser] === userFilter[prop as keyof IUser];
+                    try {
+                        await UserRepository.updateById(createdUser.id as string, { [prop]: invalidUserProps[prop as keyof IUser] } as any);
+                    } catch (err) {
+                        hasThrown = true;
+                        expect(err).to.exist;
+                        expect(err).to.have.property('name', 'ValidationError');
+                        expect(err).to.have.property('errors');
+                        expect(err.errors).to.have.property(prop);
+                    } finally {
+                        expect(hasThrown).to.be.true;
                     }
-
-                    return match;
-                }).length;
-
-                expect(updated).to.exist;
-                expect(updated).to.have.property('nModified', amountOfRequiredUpdates);
-
-                const documents = await UserRepository.getMany(userDataToUpdate);
-                expect(documents).to.exist;
-                expect(documents).to.be.an('array');
-                expect(documents).to.have.lengthOf(amountOfRequiredUpdates);
-            });
-
-            it('Should update all documents when no filter passed', async function () {
-                const updated = await UserRepository.updateMany({}, userDataToUpdate);
-                expect(updated).to.exist;
-                expect(updated).to.have.property('nModified', userArr.length);
-
-                const documents = await UserRepository.getMany(userDataToUpdate);
-                expect(documents).to.exist;
-                expect(documents).to.be.an('array');
-                expect(documents).to.have.lengthOf(userArr.length);
-            });
-
-            it('Should do nothing when criteria does not match any document', async function () {
-                const updated = await UserRepository.updateMany(unexistingUser, userDataToUpdate);
-                expect(updated).to.exist;
-                expect(updated).to.have.property('nModified', 0);
-
-                const documents = await UserRepository.getMany(userDataToUpdate);
-                expect(documents).to.exist;
-                expect(documents).to.be.an('array');
-                expect(documents).to.have.lengthOf(0);
-            });
-
-        });
-
-        context('When data is invalid', function () {
-
-            it('Should throw error when empty data provided', async function () {
-                let hasThrown = false;
-
-                try {
-                    await UserRepository.updateMany(userFilter, {});
-                } catch (err) {
-                    hasThrown = true;
-                    expect(err).to.exist;
-                    expect(err instanceof ServerError).to.be.true;
-                } finally {
-                    expect(hasThrown).to.be.true;
-                }
-            });
-
-            it('Should not update documents when invalid data passed', async function () {
-                await UserRepository.updateMany({}, unknownProperty);
-
-                const documents = await UserRepository.getMany({});
-                expect(documents).to.exist;
-                expect(documents).to.be.an('array');
-                expect(documents).to.satisfy((documents: IUser[]) => {
-                    documents.forEach((doc: IUser) => {
-                        for (const prop in unknownProperty) {
-                            expect(doc).to.not.have.property(prop);
-                        }
-                    });
-
-                    return true;
                 });
-            });
-        });
-    });
-
-    describe('#deleteById()', function () {
-
-        let document: IUser;
-
-        beforeEach(async function () {
-            document = await UserRepository.create(user);
-        });
-
-        context('When data is valid', function () {
-
-            it('Should delete document by id', async function () {
-                const deleted = await UserRepository.deleteById(document.id!);
-                expect(deleted).to.exist;
-                expect(deleted).to.have.property('id', document.id);
-
-                const doc = await UserRepository.getById(document.id!);
-                expect(doc).to.not.exist;
-            });
-
-            it('Should return null when document does not exist', async function () {
-                const deleted = await UserRepository.deleteById(new mongoose.Types.ObjectId().toHexString());
-                expect(deleted).to.not.exist;
-            });
-        });
-
-        context('When data is invalid', function () {
-            it('Should throw error when id is not in the correct format', async function () {
-                let hasThrown = false;
-
-                try {
-                    await UserRepository.deleteById('invalid id');
-                } catch (err) {
-                    hasThrown = true;
-                    expect(err).to.exist;
-                    expect(err).to.have.property('name', 'CastError');
-                    expect(err).to.have.property('kind', 'ObjectId');
-                    expect(err).to.have.property('path', '_id');
-                } finally {
-                    expect(hasThrown).to.be.true;
-                }
-            });
+            }
         });
     });
 
@@ -320,84 +204,24 @@ describe('User Repository', function () {
                 const doc = await UserRepository.getById(document.id!);
                 expect(doc).to.exist;
                 expect(doc).to.have.property('id', document.id);
+
                 for (const prop in user) {
                     expect(doc).to.have.property(prop, user[prop as keyof IUser]);
                 }
             });
 
             it('Should return null when document does not exist', async function () {
-                const doc = await UserRepository.getById(validId);
+                const doc = await UserRepository.getById(unexistingUser.id!);
                 expect(doc).to.not.exist;
             });
         });
 
         context('When data is invalid', function () {
             it('Should throw error when id is not in correct format', async function () {
-                let hasThrown = false;
+                const user = await UserRepository.getById(invalidId);
 
-                try {
-                    await UserRepository.getById(invalidId);
-                } catch (err) {
-                    hasThrown = true;
-
-                    expect(err).to.exist;
-                } finally {
-                    expect(hasThrown).to.be.true;
-                }
-            });
-        });
-    });
-
-    describe('#getOne()', function () {
-
-        context('When data is valid', function () {
-            let document: IUser;
-
-            beforeEach(async function () {
-                document = await UserRepository.create(user);
-            });
-
-            it('Should return document by id', async function () {
-                const doc = await UserRepository.getOne({ _id: document.id } as Partial<IUser>);
-                expect(doc).to.exist;
-                for (const prop in user) {
-                    expect(doc).to.have.property(prop, user[prop as keyof IUser]);
-                }
-            });
-
-            it('Should return document by property', async function () {
-                const doc = await UserRepository.getOne(userFilter);
-                expect(doc).to.exist;
-                expect(doc).to.have.property('id', document.id);
-                for (const prop in user) {
-                    expect(doc).to.have.property(prop, user[prop as keyof IUser]);
-                }
-            });
-
-            it('Should return null when document does not exist', async function () {
-                const doc = await UserRepository.getOne(unexistingUser);
-                expect(doc).to.not.exist;
-            });
-        });
-
-        context('When data is invalid', function () {
-            it('Should throw error when filter does not exist', async function () {
-                let hasThrown = false;
-
-                try {
-                    await UserRepository.getOne({});
-                } catch (err) {
-                    hasThrown = true;
-                    expect(err).to.exist;
-                    expect(err instanceof ServerError).to.be.true;
-                } finally {
-                    expect(hasThrown).to.be.true;
-                }
-            });
-
-            it('Should return null when filter is not in the correct format', async function () {
-                const doc = await UserRepository.getOne(unknownProperty);
-                expect(doc).to.not.exist;
+                expect(user).to.not.exist;
+                expect(user).to.be.null;
             });
         });
     });
@@ -406,18 +230,18 @@ describe('User Repository', function () {
 
         context('When data is valid', function () {
 
-            beforeEach(async function () {
-                await UserRepository.createMany(userArr);
+            beforeEach(function () {
+                return Promise.all(userArr.map(user => UserRepository.create(user)));
             });
 
             it('Should return all documents when filter is empty', async function () {
-                const documents = await UserRepository.getMany({});
+                const documents = await UserRepository.getMany({}, 0, 10);
                 expect(documents).to.exist;
                 expect(documents).to.be.an('array');
                 expect(documents).to.have.lengthOf(userArr.length);
             });
 
-            it('Should return only matching documents', async function () {
+            it('Should return only matching documents by 2 properties', async function () {
                 const documents = await UserRepository.getMany(userFilter);
                 expect(documents).to.exist;
                 expect(documents).to.be.an('array');
@@ -434,8 +258,25 @@ describe('User Repository', function () {
                 expect(documents).to.have.lengthOf(amountOfRequiredDocuments);
             });
 
+            const validUserWithoutId: Partial<IUser> = { ...user };
+            delete validUserWithoutId.id;
+
+            for (const prop in validUserWithoutId) {
+                it(`Should return only matching documents by ${prop}`, async function () {
+                    const documents = await UserRepository.getMany({ [prop]: user[prop as keyof IUser] }, 0, 10);
+                    expect(documents).to.exist;
+                    expect(documents).to.be.an('array');
+
+                    const amountOfRequiredDocuments = userArr.filter((item: IUser) => {
+                        return item[prop as keyof IUser] === user[prop as keyof IUser];
+                    }).length;
+
+                    expect(documents).to.have.lengthOf(amountOfRequiredDocuments);
+                });
+            }
+
             it('Should return empty array when critiria not matching any document', async function () {
-                const documents = await UserRepository.getMany(unexistingUser);
+                const documents = await UserRepository.getMany(unexistingUserFilter, 0, 10);
                 expect(documents).to.exist;
                 expect(documents).to.be.an('array');
                 expect(documents).to.have.lengthOf(0);
@@ -458,7 +299,7 @@ describe('User Repository', function () {
             });
 
             it('Should return empty array when filter is not in correct format', async function () {
-                const documents = await UserRepository.getMany(unknownProperty);
+                const documents = await UserRepository.getMany(unknownProperty, 0, 10);
                 expect(documents).to.exist;
                 expect(documents).to.be.an('array');
                 expect(documents).to.have.lengthOf(0);
@@ -470,8 +311,8 @@ describe('User Repository', function () {
 
         context('When data is valid', function () {
 
-            beforeEach(async function () {
-                await UserRepository.createMany(userArr);
+            beforeEach(function () {
+                return Promise.all(userArr.map(user => UserRepository.create(user)));
             });
 
             it('Should return amount of all documents when no filter provided', async function () {
@@ -498,6 +339,14 @@ describe('User Repository', function () {
                 expect(amount).to.equal(amountOfRequiredDocuments);
             });
 
+            it('Should return 2 for matching 2 users by 2 properties', async function () {
+                await UserRepository.create(sameUserNames);
+                const amount = await UserRepository.getAmount(userFilter);
+                expect(amount).to.exist;
+                expect(amount).to.be.a('number');
+                expect(amount).to.equal(2);
+            });
+
             it('Should return 0 when no documents matching filter', async function () {
                 const amount = await UserRepository.getAmount(unexistingUser);
                 expect(amount).to.exist;
@@ -516,3 +365,11 @@ describe('User Repository', function () {
         });
     });
 });
+
+function expectToHaveEqualProperty(source: Object, prop: string, value: any) {
+    if (typeof value === 'object') {
+        expect(source).to.have.property(prop).deep.equal(value);
+    } else {
+        expect(source).to.have.property(prop, value);
+    }
+}

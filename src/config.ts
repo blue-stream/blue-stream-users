@@ -20,9 +20,31 @@ export const config = {
         password: process.env.RMQ_PASSWORD || 'guest',
         username: process.env.RMQ_USERNAME || 'guest',
     },
+    validator: {
+        user: {
+            id: /^[\w-]+@[\w-]+$/,
+            firstname: {
+                minLength: +(process.env.USER_FIRSTNAME_MIN_LEN || 2),
+                maxLength: +(process.env.USER_FIRSTNAME_MAX_LEN || 15),
+            },
+            lastname: {
+                minLength: +(process.env.USER_LASTNAME_MIN_LEN || 2),
+                maxLength: +(process.env.USER_LASTNAME_MAX_LEN || 15),
+            },
+            email: /^[\w-]+\@[\w-]+\.[\w-]+$/i,
+        },
+    },
     server: {
-        port:  +(process.env.PORT || 3000),
+        port: +(process.env.PORT || 3000),
         name: 'user',
+    },
+    pagination: {
+        startIndex: 0,
+        endIndex: 20,
+    },
+    sort: {
+        sortOrder: '-',
+        sortBy: 'createdAt',
     },
     cors: {
         allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:4200'],

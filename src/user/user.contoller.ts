@@ -1,33 +1,16 @@
 import { Request, Response } from 'express';
 import { UserManager } from './user.manager';
-
 import { UserNotFoundError } from '../utils/errors/userErrors';
-import { UpdateWriteOpResult } from 'mongodb';
+import { IUser } from './user.interface';
 
-type UpdateResponse = UpdateWriteOpResult['result'];
 export class UserController {
     static async create(req: Request, res: Response) {
         res.json(await UserManager.create(req.body));
     }
 
-    static async createMany(req: Request, res: Response) {
-        res.json(await UserManager.createMany(req.body));
-    }
-
     static async updateById(req: Request, res: Response) {
-        const updated = await UserManager.updateById(req.params.id, req.body.user);
+        const updated = await UserManager.updateById(req.params.id, req.body);
         if (!updated) {
-            throw new UserNotFoundError();
-        }
-
-        res.json(updated);
-    }
-
-    static async updateMany(req: Request, res: Response) {
-
-        const updated: UpdateResponse = await UserManager.updateMany(req.query, req.body);
-
-        if (updated.n === 0) {
             throw new UserNotFoundError();
         }
 
@@ -52,17 +35,27 @@ export class UserController {
         res.json(user);
     }
 
-    static async getOne(req: Request, res: Response) {
-        const user = await UserManager.getOne(req.query);
-        if (!user) {
-            throw new UserNotFoundError();
-        }
-
-        res.json(user);
-    }
-
     static async getMany(req: Request, res: Response) {
-        res.json(await UserManager.getMany(req.query));
+        const userFilter: Partial<IUser> = {
+            firstName: req.query.firstName,
+            lastName: req.query.lastName,
+            mail: req.query.mail,
+        };
+
+        Object.keys(userFilter).forEach((key: string) => {
+            return userFilter[key as keyof IUser] ===
+                undefined && delete userFilter[key as keyof IUser];
+        });
+
+        res.json(
+            await UserManager.getMany(
+                userFilter,
+                req.query.startIndex,
+                req.query.endIndex,
+                req.query.sortOrder,
+                req.query.sortBy,
+            ),
+        );
     }
 
     static async getAmount(req: Request, res: Response) {

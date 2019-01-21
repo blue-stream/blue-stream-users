@@ -1,26 +1,38 @@
-
 import { Types } from 'mongoose';
 import { createRequest, createResponse } from 'node-mocks-http';
 import { sign } from 'jsonwebtoken';
 import { config } from '../../config';
+import { IUser } from '../user.interface';
 
 export const responseMock = createResponse();
 
 export class ValidRequestMocks {
-    readonly validProperty: string = '12345';
-    readonly validProperty2: string = '23456';
-    readonly validProperty3: string = '34567';
+    readonly validId: string = 't012@aaa';
+    readonly validMail: string = 't012@aaa.sdf';
+    readonly validId2: string = 'T2_34E@ert';
+    readonly validMail2: string = 'T2-34@abc.abc.iif';
+    readonly validId3: string = 'AG234@aad';
+    readonly validMail3: string = 'AG234@abc.abc';
 
-    readonly user = {
-        property: this.validProperty,
+    readonly user: IUser = {
+        id: this.validId,
+        firstName: 'firstnameone',
+        lastName: 'lastnameone',
+        mail: this.validMail,
     };
 
-    readonly user2 = {
-        property: this.validProperty2,
+    readonly user2: IUser = {
+        id: this.validId2,
+        firstName: 'firstnametwo',
+        lastName: 'lastnametwo',
+        mail: this.validMail2,
     };
 
-    readonly user3 = {
-        property: this.validProperty3,
+    readonly user3: IUser = {
+        id: this.validId3,
+        firstName: 'firstnamethree',
+        lastName: 'lastnamethree',
+        mail: this.validMail3,
     };
 
     readonly userFilter = this.user;
@@ -36,19 +48,6 @@ export class ValidRequestMocks {
         body: this.user,
     });
 
-    createMany = createRequest({
-        method: 'POST',
-        url: '/api/user/many/',
-        headers: {
-            authorization: this.authorizationHeader,
-        },
-        body: [
-            this.user,
-            this.user2,
-            this.user3,
-        ],
-    });
-
     updateById = createRequest({
         method: 'PUT',
         url: '/api/user/:id',
@@ -56,19 +55,8 @@ export class ValidRequestMocks {
             authorization: this.authorizationHeader,
         },
         params: {
-            id: new Types.ObjectId(),
-            id_REMOVE: '12345',
+            id: this.validId,
         },
-        body: this.user,
-    });
-
-    updateMany = createRequest({
-        method: 'PUT',
-        url: '/api/user/many',
-        headers: {
-            authorization: this.authorizationHeader,
-        },
-        query: this.userFilter,
         body: this.user,
     });
 
@@ -79,7 +67,7 @@ export class ValidRequestMocks {
             authorization: this.authorizationHeader,
         },
         params: {
-            id: new Types.ObjectId(),
+            id: this.validId,
         },
     });
 
@@ -90,13 +78,13 @@ export class ValidRequestMocks {
             authorization: this.authorizationHeader,
         },
         params: {
-            id: new Types.ObjectId(),
+            id: this.validId,
         },
     });
 
     getOne = createRequest({
         method: 'GET',
-        url: `/api/user/one?userFilter={'property':${this.validProperty}}`,
+        url: '/api/user/one',
         headers: {
             authorization: this.authorizationHeader,
         },
@@ -105,7 +93,7 @@ export class ValidRequestMocks {
 
     getMany = createRequest({
         method: 'GET',
-        url: `/api/user/many?userFilter={'property':${this.validProperty}}`,
+        url: '/api/user/many',
         headers: {
             authorization: this.authorizationHeader,
         },
@@ -114,7 +102,7 @@ export class ValidRequestMocks {
 
     getAmount = createRequest({
         method: 'GET',
-        url: `/api/user/amount?userFilter={'property':${this.validProperty}}`,
+        url: '/api/user/amount',
         headers: {
             authorization: this.authorizationHeader,
         },

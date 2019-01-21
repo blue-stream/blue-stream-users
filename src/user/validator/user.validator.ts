@@ -1,31 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserValidations } from './user.validations';
-import { PropertyInvalidError, IdInvalidError } from '../../utils/errors/userErrors';
+import { IdInvalidError, NameInvalidError, MailInvalidError } from '../../utils/errors/userErrors';
 import { IUser } from '../user.interface';
 
 export class UserValidator {
 
     static canCreate(req: Request, res: Response, next: NextFunction) {
-        next(UserValidator.validateProperty(req.body.property));
-    }
-
-    static canCreateMany(req: Request, res: Response, next: NextFunction) {
-        const propertiesValidations: (Error | undefined)[] = req.body.map((user: IUser) => {
-            return UserValidator.validateProperty(user.property);
-        });
-
-        next(UserValidator.getNextValueFromArray(propertiesValidations));
+        next(
+            UserValidator.validateId(req.body.id) ||
+            UserValidator.validateName(req.body.firstName, req.body.lastName) ||
+            UserValidator.validateMail(req.body.mail));
     }
 
     static canUpdateById(req: Request, res: Response, next: NextFunction) {
         next(
             UserValidator.validateId(req.params.id) ||
-            UserValidator.validateProperty(req.body.property));
-    }
-
-    static canUpdateMany(req: Request, res: Response, next: NextFunction) {
-        next(UserValidator.validateProperty(req.query.property) ||
-            UserValidator.validateProperty(req.body.property));
+            UserValidator.validatePartialUser(req.body));
     }
 
     static canDeleteById(req: Request, res: Response, next: NextFunction) {
@@ -34,10 +24,6 @@ export class UserValidator {
 
     static canGetById(req: Request, res: Response, next: NextFunction) {
         next(UserValidator.validateId(req.params.id));
-    }
-
-    static canGetOne(req: Request, res: Response, next: NextFunction) {
-        next();
     }
 
     static canGetMany(req: Request, res: Response, next: NextFunction) {
@@ -56,22 +42,27 @@ export class UserValidator {
         return undefined;
     }
 
-    private static getNextValueFromArray(validationsArray: (Error | undefined)[]) {
-        let nextValue: Error | undefined;
-
-        for (let index = 0; index < validationsArray.length; index++) {
-            if (validationsArray[index] !== undefined) {
-                nextValue = validationsArray[index];
-            }
+    private static validateName(firstName: string, lastName: string) {
+        if (!UserValidations.isFirstnameValid(firstName) ||
+            !UserValidations.isLastnameValid(lastName)) {
+            return new NameInvalidError();
         }
 
-        return nextValue;
+        return undefined;
     }
 
-    private static validateProperty(property: string) {
-        if (!UserValidations.isPropertyValid(property)) {
-            return new PropertyInvalidError();
+    private static validateMail(mail: string) {
+        if (!UserValidations.isMailValid(mail)) {
+            return new MailInvalidError();
         }
+
+        return undefined;
+    }
+
+    private static validatePartialUser(user: Partial<IUser>) {
+        if (!user.firstName || !UserValidations.isFirstnameValid(user.firstName)) return new NameInvalidError('firstname is invalid');
+        if (!user.lastName || !UserValidations.isLastnameValid(user.lastName)) return new NameInvalidError('lastName is invalid');
+        if (!user.mail || !UserValidations.isMailValid(user.mail)) return new MailInvalidError();
 
         return undefined;
     }
