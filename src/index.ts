@@ -6,6 +6,7 @@ import { config } from './config';
 import { syslogSeverityLevels } from 'llamajs';
 
 import { UserBroker } from './user/user.broker';
+import { RPCServer } from './utils/rpc.server';
 process.on('uncaughtException', (err) => {
     console.error('Unhandled Exception', err.stack);
 
@@ -45,6 +46,12 @@ process.on('SIGINT', async () => {
     Logger.log(syslogSeverityLevels.Informational, 'Server Started', `Port: ${config.server.port}`);
     await rabbit.connect();
     await UserBroker.subscribe();
+
+    console.log('Starting RPC Server');
+    RPCServer.http().listen(config.rpc.port, function () {
+        console.log(`RPC server running on port ${config.rpc.port}`);
+    });
+
     console.log('Starting server');
     const server: Server = Server.bootstrap();
 
