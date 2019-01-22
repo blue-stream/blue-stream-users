@@ -30,6 +30,17 @@ export class UserManager {
         );
     }
 
+    static async getByIds(ids: string[]): Promise<{ [id: string]: IUser }> {
+        const users = await UserRepository.getByIds(ids);
+        const usersMap: { [id: string]: IUser } = {};
+
+        users.forEach((user: IUser) => {
+            usersMap[user.id] = user;
+        });
+
+        return usersMap;
+    }
+
     static getAmount(userFilter: Partial<IUser>) {
         return UserRepository.getAmount(userFilter);
     }

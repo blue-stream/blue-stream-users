@@ -20,6 +20,12 @@ export class UserRepository {
         return UserModel.findById(id).exec();
     }
 
+    static getByIds(ids: string[]): Promise<IUser[]> {
+        return UserModel.find({
+            _id: { $in: ids },
+        }).exec();
+    }
+
     static getMany(
         userFilter: Partial<IUser>,
         startIndex: number = config.pagination.startIndex,
