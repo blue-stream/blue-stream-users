@@ -1,9 +1,18 @@
-import { UserManager } from "../user/user.manager";
+import { UserManager } from '../user/user.manager';
+import { IUser } from '../user/user.interface';
 
 const jayson = require('jayson/promise');
 
 export const RPCServer = new jayson.Server({
-    async getUsersByIds(ids: string[]) {
+    getUsersByIds(ids: string[]) {
         return UserManager.getByIds(ids);
+    },
+
+    getUserById(user: { id: string }) {
+        return UserManager.getById(user.id);
+    },
+
+    createUser(user: IUser) {
+        return UserManager.create(user);
     },
 });
