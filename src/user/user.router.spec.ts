@@ -9,6 +9,7 @@ import { IdInvalidError, UserNotFoundError, NameInvalidError, MailInvalidError }
 import { config } from '../config';
 import { UserManager } from './user.manager';
 import { sign } from 'jsonwebtoken';
+import { UserModel } from './user.model';
 
 describe('User Router Module', function () {
     let server: Server;
@@ -59,18 +60,19 @@ describe('User Router Module', function () {
     const users: IUser[] = [user, user2, user3];
 
     before(async function () {
+        mongoose.set('useCreateIndex', true);
         await mongoose.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, { useNewUrlParser: true });
         server = Server.bootstrap();
     });
 
     after(async function () {
-        await mongoose.connection.db.dropDatabase();
+        await UserModel.deleteMany({}).exec();
     });
 
     describe('#POST /api/user/', function () {
         context('When request is valid', function () {
             beforeEach(async function () {
-                await mongoose.connection.db.dropDatabase();
+                await UserModel.deleteMany({}).exec();
             });
 
             it('Should return created user', function (done: MochaDone) {
@@ -98,7 +100,7 @@ describe('User Router Module', function () {
 
         context('When request is invalid', function () {
             beforeEach(async function () {
-                await mongoose.connection.db.dropDatabase();
+                await UserModel.deleteMany({}).exec();
             });
 
             it('Should return IdInvalidError when id is invalid', function (done: MochaDone) {
@@ -232,7 +234,7 @@ describe('User Router Module', function () {
 
         context('When request is valid', function () {
             beforeEach(async function () {
-                await mongoose.connection.db.dropDatabase();
+                await UserModel.deleteMany({}).exec();
                 returnedUser = await UserManager.create(user);
             });
 
@@ -280,7 +282,7 @@ describe('User Router Module', function () {
 
         context('When request is invalid', function () {
             beforeEach(async function () {
-                await mongoose.connection.db.dropDatabase();
+                await UserModel.deleteMany({}).exec();
                 returnedUser = await UserManager.create(user);
             });
 
@@ -390,7 +392,7 @@ describe('User Router Module', function () {
 
         context('When request is valid', function () {
             beforeEach(async function () {
-                await mongoose.connection.db.dropDatabase();
+                await UserModel.deleteMany({}).exec();
                 returnedUser = await UserManager.create(user);
             });
 
@@ -436,7 +438,7 @@ describe('User Router Module', function () {
 
         context('When request is invalid', function () {
             beforeEach(async function () {
-                await mongoose.connection.db.dropDatabase();
+                await UserModel.deleteMany({}).exec();
                 returnedUser = await UserManager.create(user);
             });
 
@@ -463,7 +465,7 @@ describe('User Router Module', function () {
     describe('#GET /api/user/many', function () {
         context('When request is valid', function () {
             beforeEach(async function () {
-                await mongoose.connection.db.dropDatabase();
+                await UserModel.deleteMany({}).exec();
                 return Promise.all(users.map(user => UserManager.create(user)));
             });
 
@@ -512,7 +514,7 @@ describe('User Router Module', function () {
     describe('#GET /api/user/amount', function () {
         context('When request is valid', function () {
             beforeEach(async function () {
-                await mongoose.connection.db.dropDatabase();
+                await UserModel.deleteMany({}).exec();
                 return Promise.all(users.map(user => UserManager.create(user)));
             });
 
