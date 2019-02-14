@@ -9,8 +9,14 @@ export const RPCServer = new jayson.Server({
         return UserManager.getByIds(ids);
     },
 
-    getUserById(user: { id: string }) {
-        return UserManager.getById(user.id);
+    async getUserById(user: { id: string }) {
+        const userData: any = await UserManager.getById(user.id);
+        const classifications = await ClassificationManager.getUserClassifications(user.id);
+
+        return {
+            ...userData.toObject(),
+            classifications,
+        };
     },
 
     createUser(user: IUser) {
