@@ -52,7 +52,7 @@ userSchema.virtual('id').set(function (this: IUser & mongoose.Document, id: stri
 });
 
 userSchema.virtual('name').get(function (this: IUser & mongoose.Document) {
-    return this.firstName + ' ' + this.lastName;
+    return `${this.firstName} ${this.lastName}`;
 });
 
 export const UserModel = mongoose.model<IUser & mongoose.Document>('User', userSchema);
