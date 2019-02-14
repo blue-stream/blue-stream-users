@@ -5,6 +5,7 @@ import { ClassificationRepository } from './classification.repository';
 import { ClassificationModel } from './classification.model';
 import { ClassificationManager } from './classification.manager';
 import { IClassification } from './classification.interface';
+import { ClassificationsServiceMock } from './classification.service.mock';
 
 const unknownUser = 'unknown@user';
 const userWithNoClassifications = 'a@none';
@@ -12,6 +13,7 @@ const userWithClassifications = 'c@moreThenLittle';
 
 describe('Classification Manager', function () {
     before(async function () {
+        ClassificationsServiceMock.startMock();
         mongoose.set('useCreateIndex', true);
         await mongoose.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, { useNewUrlParser: true });
     });
@@ -21,6 +23,7 @@ describe('Classification Manager', function () {
     });
 
     after(async function () {
+        ClassificationsServiceMock.stopMock();
         await mongoose.connection.close();
     });
 

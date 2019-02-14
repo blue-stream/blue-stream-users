@@ -1,7 +1,18 @@
 import { expect } from 'chai';
 import { ClassificationService } from './classification.service';
+import { ClassificationsServiceMock } from './classification.service.mock';
 
 describe('Classification Service', function () {
+
+    before(function (done: MochaDone) {
+        ClassificationsServiceMock.startMock();
+        done();
+    });
+
+    after(function (done: MochaDone) {
+        ClassificationsServiceMock.stopMock();
+        done();
+    });
 
     describe('#fetchUserClassifications()', function () {
         it('Should get user\'s classification from external api', async function () {
