@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import * as mongoose from 'mongoose';
 import { config } from '../config';
-import { ServerError } from '../utils/errors/applicationError';
 import { IUser } from './user.interface';
 import { UserRepository } from './user.repository';
 import { UserValidations } from './validator/user.validations';
+import { UserModel } from './user.model';
 
 const validId: string = 'T234@245';
 const invalidId: string = 'ADSS234.ssd@df';
@@ -57,11 +57,12 @@ const userArr: IUser[] = [user, user2, user3];
 
 describe('User Repository', function () {
     before(async function () {
+        mongoose.set('useCreateIndex', true);
         await mongoose.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, { useNewUrlParser: true });
     });
 
     afterEach(async function () {
-        await mongoose.connection.dropDatabase();
+        await UserModel.deleteMany({}).exec();
     });
 
     after(async function () {
