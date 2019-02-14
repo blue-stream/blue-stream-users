@@ -1,7 +1,6 @@
 import { IUser } from './user.interface';
 import { UserModel } from './user.model';
 import { config } from '../config';
-import { ServerError } from '../utils/errors/applicationError';
 
 export class UserRepository {
     static create(user: IUser): Promise<IUser> {
