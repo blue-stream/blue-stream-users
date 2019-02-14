@@ -3,7 +3,7 @@ import { stringify } from 'querystring';
 import { config } from '../config';
 
 export class HttpClient {
-    private static axiosInstance: AxiosInstance = axios.create({
+    static axiosInstance: AxiosInstance = axios.create({
         baseURL: config.classifications.serviceApi,
         headers: {
             Authorization: `Bearer ${config.classifications.token}`,
