@@ -56,9 +56,4 @@ export const config = {
         required: true,
         secret: process.env.SECRET_KEY || 'bLue5tream@2018', // Don't use static value in production! remove from source control!
     },
-    classifications: {
-        serviceApi: process.env.CLASSIFICATIONS_API || 'http://localhost:5006/classificationservice/api',
-        token: process.env.CLASSIFICATIONS_API_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.B3bRU1r3QAooc974CfHtGwQUYIUjEV4wywoO0bvOO0E',
-        expirationDays: +(process.env.CLASSIFICATIONS_EXPIRATION_DAYS || 3), // Days
-    },
 };
