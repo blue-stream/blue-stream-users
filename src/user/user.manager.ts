@@ -44,4 +44,17 @@ export class UserManager {
     static getAmount(userFilter: Partial<IUser>) {
         return UserRepository.getAmount(userFilter);
     }
+
+    static getSearched(
+        searchFilter: string,
+        startIndex?: number,
+        endIndex?: number,
+        sortOrder?: '-' | '',
+        sortBy?: string) {
+        return UserRepository.getSearched(searchFilter, startIndex, endIndex, sortOrder, sortBy);
+    }
+
+    static getSearchedAmount(searchFilter: string) {
+        return UserRepository.getSearchedAmount(searchFilter);
+    }
 }
