@@ -44,4 +44,59 @@ export class UserRepository {
     static getAmount(userFilter: Partial<IUser>): Promise<number> {
         return UserModel.countDocuments(userFilter).exec();
     }
+
+    static getSearched(
+        searchFilter: string = '',
+        startIndex: number = config.pagination.startIndex,
+        endIndex: number = config.pagination.endIndex,
+        sortOrder: string = config.sort.sortOrder,
+        sortBy: string = config.sort.sortBy) {
+        return UserModel.find({
+            $or: [
+                { _id: { $regex: searchFilter, $options: 'i' } },
+                {
+                    $and: [
+                        { firstName: { $regex: searchFilter.slice(0, searchFilter.indexOf(' ')), $options: 'i' } },
+                        { lastName: { $regex: searchFilter.slice(searchFilter.indexOf(' ') + 1), $options: 'i' } },
+                    ],
+                },
+                {
+                    $and: [
+                        { firstName: { $regex: searchFilter.slice(searchFilter.indexOf(' ') + 1), $options: 'i' } },
+                        { lastName: { $regex: searchFilter.slice(0, searchFilter.indexOf(' ')), $options: 'i' } },
+                    ],
+                },
+                { firstName: { $regex: searchFilter, $options: 'i' } },
+                { lastName: { $regex: searchFilter, $options: 'i' } },
+                { mail: { $regex: searchFilter, $options: 'i' } },
+            ],
+        })
+            .sort(sortOrder + sortBy)
+            .skip(+startIndex)
+            .limit(endIndex - startIndex)
+            .exec();
+    }
+
+    static getSearchedAmount(searchFilter: string = '') {
+        return UserModel.countDocuments({
+            $or: [
+                { _id: { $regex: searchFilter, $options: 'i' } },
+                {
+                    $and: [
+                        { firstName: { $regex: searchFilter.slice(0, searchFilter.indexOf(' ')), $options: 'i' } },
+                        { lastName: { $regex: searchFilter.slice(searchFilter.indexOf(' ') + 1), $options: 'i' } },
+                    ],
+                },
+                {
+                    $and: [
+                        { firstName: { $regex: searchFilter.slice(searchFilter.indexOf(' ') + 1), $options: 'i' } },
+                        { lastName: { $regex: searchFilter.slice(0, searchFilter.indexOf(' ')), $options: 'i' } },
+                    ],
+                },
+                { firstName: { $regex: searchFilter, $options: 'i' } },
+                { lastName: { $regex: searchFilter, $options: 'i' } },
+                { mail: { $regex: searchFilter, $options: 'i' } },
+            ],
+        }).exec();
+    }
 }

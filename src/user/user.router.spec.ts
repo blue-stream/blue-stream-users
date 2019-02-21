@@ -551,4 +551,129 @@ describe('User Router Module', function () {
             });
         });
     });
+
+    describe('#GET /api/user/search', function () {
+
+        context('When request is valid', function () {
+            beforeEach(async function () {
+                await mongoose.connection.db.dropDatabase();
+                return Promise.all(users.map(user => UserManager.create(user)));
+            });
+
+            it('Should return all videos when searchFilter is empty', function (done: MochaDone) {
+                request(server.app)
+                    .get('/api/user/search?searchFilter=')
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('array');
+                        const returnedUsers: IUser[] = res.body;
+                        expect(returnedUsers.length).to.be.equals(users.length);
+
+                        returnedUsers.forEach(function (usr) {
+                            for (const prop in user) {
+                                expect(usr).to.have.property(prop);
+                            }
+                        });
+
+                        done();
+                    });
+            });
+
+            it('Should return users filitered by id / firstName / lastName / mail', function (done: MochaDone) {
+                request(server.app)
+                    .get('/api/user/search?searchFilter=t')
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.an('array');
+
+                        const returnedUsers: IUser[] = res.body;
+                        const expectedResults = users.filter((usr: IUser) => {
+                            return (
+                                usr.id.includes('t') ||
+                                usr.firstName.includes('t') ||
+                                usr.lastName.includes('t') ||
+                                usr.mail.includes('t')
+                            );
+                        }).length;
+
+                        expect(returnedUsers).to.have.length(expectedResults);
+
+                        returnedUsers.forEach(function (usr) {
+                            for (const prop in user) {
+                                expect(usr).to.have.property(prop);
+                            }
+                        });
+
+                        done();
+                    });
+            });
+        });
+    });
+
+    describe('#GET /api/user/search/amount', function () {
+
+        context('When request is valid', function () {
+            beforeEach(async function () {
+                await mongoose.connection.db.dropDatabase();
+                return Promise.all(users.map(user => UserManager.create(user)));
+            });
+
+            it('Should return all videos when searchFilter is empty', function (done: MochaDone) {
+                request(server.app)
+                    .get('/api/user/search/amount?searchFilter=')
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.a('number');
+                        expect(res.body).to.be.equals(users.length);
+
+                        done();
+                    });
+            });
+
+            it('Should return users filitered by id / firstName / lastName / mail', function (done: MochaDone) {
+                request(server.app)
+                    .get('/api/user/search/amount?searchFilter=t')
+                    .set({ authorization: authorizationHeader })
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .end((error: Error, res: request.Response) => {
+                        expect(error).to.not.exist;
+                        expect(res).to.exist;
+                        expect(res.status).to.equal(200);
+                        expect(res).to.have.property('body');
+                        expect(res.body).to.be.a('number');
+
+                        const expectedResults = users.filter((usr: IUser) => {
+                            return (
+                                usr.id.includes('t') ||
+                                usr.firstName.includes('t') ||
+                                usr.lastName.includes('t') ||
+                                usr.mail.includes('t')
+                            );
+                        }).length;
+
+                        expect(res.body).to.be.equals(expectedResults);
+                        done();
+                    });
+            });
+        });
+    });
 });
