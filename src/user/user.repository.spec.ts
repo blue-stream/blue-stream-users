@@ -526,6 +526,120 @@ describe('User Repository', function () {
             });
         });
     });
+
+    describe('#getSearchedAmount()', function () {
+
+        context('When data is valid', function () {
+            const usersArr: IUser[] = [...userArr, sameUserNames];
+
+            beforeEach(function () {
+                return Promise.all(usersArr.map(user => UserRepository.create(user)));
+            });
+
+            it('Should return number of all users when searchFilter is empty', async function () {
+                const documents = await UserRepository.getSearchedAmount('');
+                expect(documents).to.exist;
+                expect(documents).to.be.a('number');
+                expect(documents).to.be.equals(usersArr.length);
+            });
+
+            it('Should return number of users filtered by id', async function () {
+                const documents = await UserRepository.getSearchedAmount('T234@245');
+                expect(documents).to.exist;
+                expect(documents).to.be.a('number');
+
+                const expectedResults = usersArr.filter((user: IUser) => {
+                    return user.id.includes('T234@245');
+                }).length;
+
+                expect(documents).to.be.equals(expectedResults);
+            });
+
+            it('Should return number of users filtered by firstName', async function () {
+                const documents = await UserRepository.getSearchedAmount('firstnametwo');
+                expect(documents).to.exist;
+                expect(documents).to.be.a('number');
+
+                const expectedResults = usersArr.filter((user: IUser) => {
+                    return user.firstName.includes('firstnametwo');
+                }).length;
+
+                expect(documents).to.be.equals(expectedResults);
+            });
+
+            it('Should return number of users filtered by lastName', async function () {
+                const documents = await UserRepository.getSearchedAmount('lastnametwo');
+                expect(documents).to.exist;
+                expect(documents).to.be.a('number');
+
+                const expectedResults = usersArr.filter((user: IUser) => {
+                    return user.lastName.includes('lastnametwo');
+                }).length;
+
+                expect(documents).to.be.equals(expectedResults);
+            });
+
+            it('Should return number of users filtered by mail', async function () {
+                const documents = await UserRepository.getSearchedAmount('ADSFD@sss.sdf');
+                expect(documents).to.exist;
+                expect(documents).to.be.a('number');
+
+                const expectedResults = usersArr.filter((user: IUser) => {
+                    return user.mail.includes('ADSFD@sss.sdf');
+                }).length;
+
+                expect(documents).to.be.equals(expectedResults);
+            });
+
+            it('Should return number of users filtered by name', async function () {
+                const documents = await UserRepository.getSearchedAmount('firstnameone lastnamethree');
+                expect(documents).to.exist;
+                expect(documents).to.be.a('number');
+
+                const expectedResults = usersArr.filter((user: IUser) => {
+                    return (user.firstName.includes('firstnameone') && user.lastName.includes('lastnamethree'));
+                }).length;
+
+                expect(documents).to.be.equals(expectedResults);
+            });
+
+            it('Should return number of users filtered by reversed name (lastname first, firstName after)', async function () {
+                const documents = await UserRepository.getSearchedAmount('lastnamethree firstnameone');
+                expect(documents).to.exist;
+                expect(documents).to.be.a('number');
+
+                const expectedResults = usersArr.filter((user: IUser) => {
+                    return (user.firstName.includes('firstnameone') && user.lastName.includes('lastnamethree'));
+                }).length;
+
+                expect(documents).to.be.equals(expectedResults);
+            });
+
+            it('Should return number of users filtered by id / firstName / lastName / mail', async function () {
+                const documents = await UserRepository.getSearchedAmount('t');
+                expect(documents).to.exist;
+                expect(documents).to.be.a('number');
+
+                const expectedResults = usersArr.filter((user: IUser) => {
+                    return (
+                        user.id.includes('t') ||
+                        user.firstName.includes('t') ||
+                        user.lastName.includes('t') ||
+                        user.mail.includes('t')
+                    );
+                }).length;
+
+                expect(documents).to.be.equals(expectedResults);
+            });
+
+            it('Should return empty array when search term not satesfies', async function () {
+                const filteredVideos = await UserRepository.getSearchedAmount('unexisting user');
+                expect(filteredVideos).to.exist;
+                expect(filteredVideos).to.be.a('number');
+                expect(filteredVideos).to.be.equals(0);
+            });
+        });
+    });
 });
 
 function expectToHaveEqualProperty(source: Object, prop: string, value: any) {
