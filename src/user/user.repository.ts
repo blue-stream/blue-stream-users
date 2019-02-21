@@ -80,9 +80,22 @@ export class UserRepository {
     static getSearchedAmount(searchFilter: string = '') {
         return UserModel.countDocuments({
             $or: [
-                { title: { $regex: searchFilter, $options: 'i' } },
-                { tags: { $elemMatch: { $regex: searchFilter, $options: 'i' } } },
-                { description: { $regex: searchFilter, $options: 'i' } },
+                { _id: { $regex: searchFilter, $options: 'i' } },
+                {
+                    $and: [
+                        { firstName: { $regex: searchFilter.slice(0, searchFilter.indexOf(' ')), $options: 'i' } },
+                        { lastName: { $regex: searchFilter.slice(searchFilter.indexOf(' ') + 1), $options: 'i' } },
+                    ],
+                },
+                {
+                    $and: [
+                        { firstName: { $regex: searchFilter.slice(searchFilter.indexOf(' ') + 1), $options: 'i' } },
+                        { lastName: { $regex: searchFilter.slice(0, searchFilter.indexOf(' ')), $options: 'i' } },
+                    ],
+                },
+                { firstName: { $regex: searchFilter, $options: 'i' } },
+                { lastName: { $regex: searchFilter, $options: 'i' } },
+                { mail: { $regex: searchFilter, $options: 'i' } },
             ],
         }).exec();
     }
