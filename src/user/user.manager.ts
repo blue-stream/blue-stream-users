@@ -8,6 +8,10 @@ export class UserManager {
         return UserRepository.create(user);
     }
 
+    static createUserProfile(user: IUser) {
+
+    }
+
     static updateById(id: string, user: Partial<IUser>) {
         return UserRepository.updateById(id, user);
     }
