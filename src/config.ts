@@ -52,6 +52,14 @@ export const config = {
     cors: {
         allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:4200'],
     },
+    channels: {
+        endpoint: process.env.CHANNELS_RPC_ENDPOINT || 'http://localhost',
+        port: +(process.env.CHANNELS_RPC_PORT || 6000),
+        methods: {
+            CREATE_USER_PROFILE: 'createUserProfile',
+        },
+        defaultProfileDesc: 'User\'s profile',
+    },
     authentication: {
         required: true,
         secret: process.env.SECRET_KEY || 'bLue5tream@2018', // Don't use static value in production! remove from source control!
