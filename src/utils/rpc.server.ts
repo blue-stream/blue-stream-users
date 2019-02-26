@@ -14,7 +14,7 @@ export const RPCServer = new jayson.Server({
 
     async createUser(user: IUser) {
         const createdUser = await UserManager.create(user);
-        await UserManager.createUserProfile(user);
+        UserManager.createUserProfile(user);
         return createdUser;
     },
 });
