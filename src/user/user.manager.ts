@@ -10,15 +10,15 @@ export class UserManager {
         return UserRepository.create(user);
     }
 
-    static createUserProfile(user: IUser) {
+    static async createUserProfile(user: IUser) {
         const userProfile: IChannel = {
-            user: user.id,
+            user: user.id.toLocaleLowerCase(),
             name: `${user.firstName} ${user.lastName}`,
             description: config.channels.defaultProfileDesc,
             isProfile: true,
         };
 
-        ChannelsRpc.createUserProfile(userProfile);
+        return await ChannelsRpc.createUserProfile(userProfile);
     }
 
     static updateById(id: string, user: Partial<IUser>) {
