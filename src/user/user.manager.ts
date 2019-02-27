@@ -12,7 +12,7 @@ export class UserManager {
 
     static async createUserProfile(user: IUser) {
         const userProfile: IChannel = {
-            user: user.id.toLocaleLowerCase(),
+            user: user.id.toLowerCase(),
             name: `${user.firstName} ${user.lastName}`,
             description: config.channels.defaultProfileDesc,
             isProfile: true,
