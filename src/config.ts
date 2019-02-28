@@ -56,9 +56,8 @@ export const config = {
         endpoint: process.env.CHANNELS_RPC_ENDPOINT || 'http://localhost',
         port: +(process.env.CHANNELS_RPC_PORT || 6000),
         methods: {
-            CREATE_USER_PROFILE: 'createUserProfile',
+            CREATE_USER_PROFILE: 'createUserChannel',
         },
-        defaultProfileDesc: 'User\'s profile',
     },
     authentication: {
         required: true,
