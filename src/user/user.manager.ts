@@ -1,8 +1,7 @@
 import { IUser } from './user.interface';
 import { UserRepository } from './user.repository';
-import { ChannelsRpc } from '../channel/channel.rpc';
+import { ClientRpc } from '../utils/rpc.client';
 import { config } from '../config';
-import { IChannel } from '../channel/channel.interface';
 
 export class UserManager {
 
@@ -11,14 +10,7 @@ export class UserManager {
     }
 
     static async createUserProfile(user: IUser) {
-        const userProfile: IChannel = {
-            user: user.id.toLowerCase(),
-            name: `${user.firstName} ${user.lastName}`,
-            description: config.channels.defaultProfileDesc,
-            isProfile: true,
-        };
-
-        return await ChannelsRpc.createUserProfile(userProfile);
+        return await ClientRpc.createUserChannel({ id: user.id, name: `${user.firstName} ${user.lastName}` });
     }
 
     static updateById(id: string, user: Partial<IUser>) {
