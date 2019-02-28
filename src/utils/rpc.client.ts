@@ -1,5 +1,4 @@
 import { config } from '../config';
-import { IChannel } from '../channel/channel.interface';
 
 const jayson = require('jayson/promise');
 
