@@ -9,7 +9,7 @@ export class UserManager {
         return UserRepository.create(user);
     }
 
-    static async createUserProfile(user: IUser) {
+    static async createUserChannel(user: IUser) {
         return await ClientRpc.createUserChannel({ id: user.id, name: `${user.firstName} ${user.lastName}` });
     }
 
