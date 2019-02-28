@@ -1,11 +1,16 @@
 import { IUser } from './user.interface';
 import { UserRepository } from './user.repository';
+import { RPCClient } from '../utils/rpc.client';
 import { config } from '../config';
 
 export class UserManager {
 
     static create(user: IUser) {
         return UserRepository.create(user);
+    }
+
+    static createUserChannel(user: IUser) {
+        return RPCClient.createUserChannel({ id: user.id, name: `${user.firstName} ${user.lastName}` });
     }
 
     static updateById(id: string, user: Partial<IUser>) {

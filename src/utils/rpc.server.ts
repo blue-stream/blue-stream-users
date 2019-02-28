@@ -12,7 +12,9 @@ export const RPCServer = new jayson.Server({
         return UserManager.getById(user.id);
     },
 
-    createUser(user: IUser) {
-        return UserManager.create(user);
+    async createUser(user: IUser) {
+        await UserManager.createUserChannel(user);
+
+        return await UserManager.create(user);
     },
 });
