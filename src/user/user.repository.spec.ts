@@ -57,7 +57,7 @@ const userArr: IUser[] = [user, user2, user3];
 
 describe('User Repository', function () {
     before(async function () {
-        await mongoose.connect(`mongodb://${config.db.host}:${config.db.port}/${config.db.name}`, { useNewUrlParser: true });
+        await mongoose.connect(config.db.connectionString, { useNewUrlParser: true });
     });
 
     afterEach(async function () {
