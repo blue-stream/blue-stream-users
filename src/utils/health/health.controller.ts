@@ -1,7 +1,7 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 export class HealthController {
-    static healthCheck(res: Response) {
-        return res.sendStatus(200);
+    static healthCheck(req: Request, res: Response) {
+        res.sendStatus(200);
     }
 }
