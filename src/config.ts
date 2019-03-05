@@ -58,7 +58,7 @@ export const config = {
         },
     },
     authentication: {
-        required: false,
+        required: true,
         secret: process.env.SECRET_KEY || 'bLue5tream@2018', // Don't use static value in production! remove from source control!
     },
 };
