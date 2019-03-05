@@ -3,7 +3,7 @@ export const config = {
         port: +(process.env.RPC_PORT || 6001),
     },
     db: {
-        connectionString: `mongodb://${process.env.DB_HOSTS_PORTS || 'localhost:27017'}/${process.env.DB_USERS_NAME || 'blue-stream-user'}${process.env.DB_REPLICA_NAME ? `?replicaSet=${process.env.DB_REPLICA_NAME}` : ''}`,
+        connectionString: `mongodb://${process.env.DB_HOSTS_PORTS || 'localhost:27017'}/${process.env.USERS_DB_NAME || 'blue-stream-user'}${process.env.DB_REPLICA_NAME ? `?replicaSet=${process.env.DB_REPLICA_NAME}` : ''}`,
     },
     logger: {
         durable: false,
