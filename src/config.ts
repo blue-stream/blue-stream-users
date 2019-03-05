@@ -3,7 +3,7 @@ export const config = {
         port: +(process.env.RPC_PORT || 6001),
     },
     db: {
-        connectionString: process.env.DB_CONNECTION_STRING || 'mongodb://localhost:27017/blue-stream-user',
+        connectionString: `mongodb://${process.env.DB_HOSTS_PORTS || 'localhost:27017'}/${process.env.DB_USERS_NAME || 'blue-stream-user'}${process.env.DB_REPLICA_NAME ? `?replicaSet=${process.env.DB_REPLICA_NAME}` : ''}`,
     },
     logger: {
         durable: false,
@@ -58,7 +58,7 @@ export const config = {
         },
     },
     authentication: {
-        required: true,
+        required: false,
         secret: process.env.SECRET_KEY || 'bLue5tream@2018', // Don't use static value in production! remove from source control!
     },
 };
