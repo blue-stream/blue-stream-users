@@ -33,6 +33,10 @@ const userSchema: mongoose.Schema = new mongoose.Schema(
             },
             unique: true,
         },
+        isSysAdmin: {
+            type: Boolean,
+            required: false,
+        },
     },
     {
         versionKey: false,

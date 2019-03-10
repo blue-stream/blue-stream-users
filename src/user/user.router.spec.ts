@@ -67,7 +67,7 @@ describe('User Router Module', function () {
         await mongoose.connection.db.dropDatabase();
     });
 
-    describe('#POST /api/user/', function () {
+    describe.skip('#POST /api/user/', function () {
         context('When request is valid', function () {
             beforeEach(async function () {
                 await mongoose.connection.db.dropDatabase();
@@ -227,7 +227,7 @@ describe('User Router Module', function () {
         });
     });
 
-    describe('#PUT /api/user/:id', function () {
+    describe.skip('#PUT /api/user/:id', function () {
         let returnedUser: any;
 
         context('When request is valid', function () {
