@@ -5,9 +5,9 @@ import { Wrapper } from '../utils/wrapper';
 
 const UserRouter: Router = Router();
 
-//UserRouter.post('/', UserValidator.canCreate, Wrapper.wrapAsync(UserController.create));
+// UserRouter.post('/', UserValidator.canCreate, Wrapper.wrapAsync(UserController.create));
 
-//UserRouter.put('/:id', UserValidator.canUpdateById, Wrapper.wrapAsync(UserController.updateById));
+// UserRouter.put('/:id', UserValidator.canUpdateById, Wrapper.wrapAsync(UserController.updateById));
 
 UserRouter.get('/many', UserValidator.canGetMany, Wrapper.wrapAsync(UserController.getMany));
 UserRouter.get('/amount', UserValidator.canGetAmount, Wrapper.wrapAsync(UserController.getAmount));
