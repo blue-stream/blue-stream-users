@@ -1,12 +1,11 @@
 import * as mongoose from 'mongoose';
 import * as rabbit from './utils/rabbit';
 import { Server } from './server';
-import { Logger } from './utils/logger';
+import { log } from './utils/logger';
 import { config } from './config';
-import { syslogSeverityLevels } from 'llamajs';
-
 import { UserBroker } from './user/user.broker';
 import { RPCServer } from './utils/rpc.server';
+
 process.on('uncaughtException', (err) => {
     console.error('Unhandled Exception', err.stack);
 
@@ -36,11 +35,10 @@ process.on('SIGINT', async () => {
 
 (async () => {
     await mongoose.connect(config.db.connectionString, { useNewUrlParser: true });
-
     console.log('[MongoDB] connected');
 
-    Logger.configure();
-    Logger.log(syslogSeverityLevels.Informational, 'Server Started', `Port: ${config.server.port}`);
+    log('verbose', 'Server Started', `Port: ${config.server.port}`);
+
     await rabbit.connect();
     await UserBroker.subscribe();
 
