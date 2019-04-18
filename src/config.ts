@@ -27,7 +27,7 @@ export const config = {
                 minLength: +(process.env.USER_LASTNAME_MIN_LEN || 2),
                 maxLength: +(process.env.USER_LASTNAME_MAX_LEN || 15),
             },
-            email: /^[\w-]+\@[\w-]+\.[\w-]+$/i,
+            email: /^[\w-]+\@[\w-]+\.[\w-.]+$/i,
         },
     },
     server: {
