@@ -6,10 +6,26 @@ import { config } from '../config';
 export class UserManager {
 
     static create(user: IUser) {
+        if (!user.firstName) {
+            user.firstName = user.id;
+        }
+
+        if (!user.lastName) {
+            user.lastName = "user";
+        }
+
         return UserRepository.create(user);
     }
 
     static createUserChannel(user: IUser) {
+        if (!user.firstName) {
+            user.firstName = user.id;
+        }
+
+        if (!user.lastName) {
+            user.lastName = "user";
+        }
+
         return RPCClient.createUserChannel({ id: user.id, name: `${user.firstName} ${user.lastName}` });
     }
 

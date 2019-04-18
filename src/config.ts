@@ -21,11 +21,11 @@ export const config = {
             id: /^[\w-]+@[\w-]+$/,
             firstname: {
                 minLength: +(process.env.USER_FIRSTNAME_MIN_LEN || 2),
-                maxLength: +(process.env.USER_FIRSTNAME_MAX_LEN || 15),
+                maxLength: +(process.env.USER_FIRSTNAME_MAX_LEN || 25),
             },
             lastname: {
                 minLength: +(process.env.USER_LASTNAME_MIN_LEN || 2),
-                maxLength: +(process.env.USER_LASTNAME_MAX_LEN || 15),
+                maxLength: +(process.env.USER_LASTNAME_MAX_LEN || 25),
             },
             email: /^[\w-]+\@[\w-]+\.[\w-.]+$/i,
         },
