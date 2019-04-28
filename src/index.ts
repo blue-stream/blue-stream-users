@@ -34,8 +34,37 @@ process.on('SIGINT', async () => {
 });
 
 (async () => {
-    await mongoose.connect(config.db.connectionString, { useNewUrlParser: true });
-    console.log('[MongoDB] connected');
+    mongoose.set('useCreateIndex', true);
+
+    mongoose.connection.on('connecting', () => {
+        console.log('[MongoDB] connecting...');
+    });
+
+    mongoose.connection.on('connected', () => {
+        console.log('[MongoDB] connected');
+    });
+
+    mongoose.connection.on('error', (error) => {
+        console.log('[MongoDB] error');
+        console.log(error);
+        log('error', 'MongoDB Error', 'A MongoDB error was thrown', '', 'unknown', { error });
+        process.exit(1);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+        console.log('[MongoDB] disconnected');
+        log('error', 'MongoDB Disconnected', 'Service was disconneted from MongoDB', '', 'unknown');
+        process.exit(1);
+    });
+
+    mongoose.connection.on('reconnected', function () {
+        console.log('[MongoDB] reconnected');
+    });
+
+    await mongoose.connect(
+        config.db.connectionString,
+        { useNewUrlParser: true },
+    );
 
     log('verbose', 'Server Started', `Port: ${config.server.port}`);
 
