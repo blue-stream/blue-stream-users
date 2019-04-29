@@ -9,6 +9,7 @@ export const config = {
         elasticsearch: process.env.LOGGER_ELASTICSEARCH && {
             hosts: process.env.LOGGER_ELASTICSEARCH.split(','),
         },
+        indexPrefix: process.env.LOGGER_ELASTICSEARCH_PREFIX || 'blue-stream-logs',
     },
     rabbitMQ: {
         host: process.env.RMQ_HOST || 'localhost',
@@ -20,11 +21,11 @@ export const config = {
         user: {
             id: /^[\w-]+@[\w-]+$/,
             firstname: {
-                minLength: +(process.env.USER_FIRSTNAME_MIN_LEN || 2),
+                minLength: +(process.env.USER_FIRSTNAME_MIN_LEN || 0),
                 maxLength: +(process.env.USER_FIRSTNAME_MAX_LEN || 25),
             },
             lastname: {
-                minLength: +(process.env.USER_LASTNAME_MIN_LEN || 2),
+                minLength: +(process.env.USER_LASTNAME_MIN_LEN || 0),
                 maxLength: +(process.env.USER_LASTNAME_MAX_LEN || 25),
             },
             email: /^[\w-]+\@[\w-]+\.[\w-.]+$/i,
